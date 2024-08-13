@@ -335,7 +335,44 @@ export class ElaborationComponent implements OnInit {
     if (activiteAR.typea == 1 && activiteAR.a) { this.selectedAA = JSON.parse(activiteAR.a); } else { this.selectedStrA = JSON.parse(activiteAR.a); }
     if (activiteAR.typec == 1 && activiteAR.c) { this.selectedAC = JSON.parse(activiteAR.c); } else { this.selectedStrC = JSON.parse(activiteAR.c); }
     if (activiteAR.typei == 1 && activiteAR.i) { this.selectedAI = JSON.parse(activiteAR.i); } else { this.selectedStrI = JSON.parse(activiteAR.i); }
+
   }
+
+/*   getResponsable() {
+    let groupedValues = ""; // Initialiser la chaîne pour les valeurs regroupées
+
+    if (activiteAR.typer == 1 && activiteAR.r) {
+      this.selectedAR = JSON.parse(activiteAR.r);
+      groupedValues += `R= ${this.selectedAR.}/${this.selectedAR.structure}; `;
+    } else {
+      this.selectedStrR = JSON.parse(activiteAR.r);
+    }
+
+    if (activiteAR.typea == 1 && activiteAR.a) {
+      this.selectedAA = JSON.parse(activiteAR.a);
+      groupedValues += `A= ${this.selectedAA.agent}/${this.selectedAA.structure}; `;
+    } else {
+      this.selectedStrA = JSON.parse(activiteAR.a);
+    }
+
+    if (activiteAR.typec == 1 && activiteAR.c) {
+      this.selectedAC = JSON.parse(activiteAR.c);
+      groupedValues += `C= ${this.selectedAC.agent}/${this.selectedAC.structure}; `;
+    } else {
+      this.selectedStrC = JSON.parse(activiteAR.c);
+    }
+
+    if (activiteAR.typei == 1 && activiteAR.i) {
+      this.selectedAI = JSON.parse(activiteAR.i);
+      groupedValues += `I= ${this.selectedAI.agent}/${this.selectedAI.structure}; `;
+    } else {
+      this.selectedStrI = JSON.parse(activiteAR.i);
+    }
+
+    // Afficher ou utiliser la chaîne regroupée
+    console.log(groupedValues.trim()); // Utilisez trim() pour enlever l'espace final
+
+  } */
   getOP(operation: MoOperation, action: string) {
     this.operation = { ...operation };
     this.acte = 3;
@@ -919,7 +956,6 @@ export class ElaborationComponent implements OnInit {
         this.showSuccesDialog("successUpdateOperation");
       }, error => { this.displaySpinner = false; this.showErrorDialog("errorUpdateOperation"); })
     }
-
   }
 
 
@@ -1080,7 +1116,6 @@ export class ElaborationComponent implements OnInit {
       const allChildren = await this.listActiviteTache();
       console.log(allChildren);
       const data = [];
-
       for (const item of allChildren) {
         data.push({
           niveauActiviteID: item.data.niveauActiviteID ? item.data.niveauActiviteID : '',
@@ -1093,6 +1128,19 @@ export class ElaborationComponent implements OnInit {
           statut: item.data.statut ? item.data.statut : '',
           montant: item.data.montant ? NumberFormatter.formatWithThousandSeparator(item.data.montant) : 0
         });
+        for (const child of item.children) {
+          data.push({
+            niveauActiviteID: child.data.niveauActiviteID ? child.data.niveauActiviteID : '',
+            code: child.data.code,
+            abbreviationFr: child.data.abbreviationFr ? child.data.abbreviationFr : '',
+            libelleFr: child.data.libelleFr ? child.data.libelleFr : '',
+            objectif: child.data.objectif ? child.data.objectif : '',
+            indicateur: child.data.indicateur ? child.data.indicateur : '',
+            responsables: child.data.responsables ? child.data.responsables : '',
+            statut: child.data.statut ? child.data.statut : '',
+            montant: child.data.montant ? NumberFormatter.formatWithThousandSeparator(child.data.montant) : 0
+          });
+        }
       }
       const pageSize = doc.internal.pageSize;
       const pageHeight = pageSize.height;
@@ -1103,16 +1151,16 @@ export class ElaborationComponent implements OnInit {
         body: data.map(item => {
           if ([4].includes(item.niveauActiviteID)) {
             return [{ content: item.code + " - " + item.libelleFr, colSpan: 6, styles: { fillColor: '#d8d8d8', fontStyle: 'bold' } },
-            { content: item.montant, styles: { fillColor: '#d8d8d8', fontStyle: 'bold' } },];
+            { content: item.montant, styles: { valign: 'middle', halign: 'right', fillColor: '#d8d8d8', fontStyle: 'bold' } },];
           }
           return [
             { content: item.code, styles: { valign: 'middle', halign: 'left', fontStyle: 'bold', textColor: '#007ad9' } },
             item.libelleFr,
             item.objectif,
             item.indicateur,
-            item.responsables,
-            item.statut,
-            item.montant
+            { content: item.responsables, styles: { valign: 'middle', halign: 'left', fontSize: 6 } },
+            { content: 'Non valide', styles: { valign: 'middle', halign: 'center', fontSize: 6, fontStyle: 'bolditalic' } },
+            { content: item.montant, styles: { valign: 'middle', halign: 'right', fillColor: '#d8d8d8', fontStyle: 'bold' } },
           ];
         }),
         startY: 53,
@@ -1125,8 +1173,7 @@ export class ElaborationComponent implements OnInit {
           3: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
           4: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
           5: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
-          6: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
-          7: { valign: 'middle', halign: 'right', fontSize: 7.1, fontStyle: 'bold', cellWidth: (totalWidth * 0.08) },
+          6: { valign: 'middle', halign: 'right', fontSize: 7.1, fontStyle: 'bold', cellWidth: (totalWidth * 0.08) },
         },
         didDrawPage: (data) => {
           pageCount++;
@@ -1415,19 +1462,15 @@ export class ElaborationComponent implements OnInit {
     let allData: any[] = [];
     const activitiesMap: { [key: string]: TreeNode } = {};
     const taches = await this.api.listActiviteTache(this.organisation.organisationID, this.exercice.millesime, this.pa.moPlanTravailID).toPromise();
-
     console.log(taches);
 
     for (const item of taches) {
       let op: TreeNode = { key: item.activiteID, data: item, type: 'activite', children: [] };
       activitiesMap[item.activiteID] = op;
       allData.push(op);
-    }
 
-    for (const activite of Object.values(activitiesMap)) {
-      const childrenWithAR = await this.getAllChildrenAR(activite.data);
-      activite.children = activite.children || [];
-      activite.children.push(...childrenWithAR);
+      const childrenWithAR = await this.getAllChildrenAR(item);
+      op.children = childrenWithAR;
     }
 
     return allData;
@@ -1436,9 +1479,10 @@ export class ElaborationComponent implements OnInit {
   async getAllChildrenAR(activite: any) {
     let allChildren: any[] = [];
     const activitiesAR = await this.getARList(activite);
-    allChildren = activitiesAR.filter((ar: any) => ar.tacheID === activite.activiteID);
+    allChildren = activitiesAR.filter((ar: any) => ar.data.tacheID === activite.activiteID);
     return allChildren;
   }
+
 
 
   generateObjectiveCode(): string {
@@ -1468,7 +1512,7 @@ export class ElaborationComponent implements OnInit {
     }
     return allData;
   }
-  
+
 
   onDragOver(event: DragEvent) { event.preventDefault(); this.dropText = "Release to upload"; }
 
