@@ -10,12 +10,12 @@ import { SessionStorageService } from './session-storage.service';
 
 @Injectable()
 export class LoginActivateGuard implements CanActivate {
-  constructor(private authService: SessionStorageService, private router: Router) {}
+  constructor(private authService: SessionStorageService, private router: Router) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean>|Promise<boolean>|boolean {
+  ): Observable<boolean> | Promise<boolean> | boolean {
     if (!this.authService.getUser().username) {
       this.router.navigate(['login']);
     }

@@ -1,0 +1,334 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left">
+      <i class="fa fa-user item-page" aria-hidden="true"></i>&nbsp;&nbsp;
+      <span class="titrePage">{{ "Utilisateurs" | translate }}</span>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <button mat-raised-button class="btn-add" (click)="createUser()"> {{ "nouveau" | translate
+        }}</button>&nbsp;&nbsp;
+      <button mat-raised-button color="secondary" (click)="refresh()"></button>&nbsp;&nbsp;
+    </ng-template>
+  </p-toolbar>
+  <div class="row mb-2">
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <div class="shadow border-none push-right"
+        style="padding: 0.5%; border: 0.5px solid rgb(166, 166, 166); background-color: rgb(234, 234, 234)">
+        <div>
+          <i class="pi pi-search"></i>&nbsp;&nbsp;
+          <input pInputText (input)=" dt.filterGlobal($any($event.target).value, 'contains') " type="text"
+            style="width: 90%" placeholder="Rechercher..." />
+          &nbsp;&nbsp;
+        </div>
+      </div>
+    </div>
+  </div>
+  <p-table #dt [value]="users" [rows]="10" styleClass="p-datatable-sm"
+      [globalFilterFields]="[ 'login', 'password', 'nom', 'telephone', 'email', 'actif', 'last_update', 'create_at' ]"
+      [(selection)]="selectedUsers" [rowHover]="true" dataKey="login" [paginator]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3%; text-align: center">N°</th>
+          <th pSortableColumn="nom" style="width: 15%"> Noms <p-sortIcon field="nom"></p-sortIcon> </th>
+          <th pSortableColumn="prenom" style="width: 15%"> Prenons <p-sortIcon field="prenom"></p-sortIcon> </th>
+          <th pSortableColumn="prenom" style="width: 15%"> Email <p-sortIcon field="prenom"></p-sortIcon> </th>
+          <th pSortableColumn="prenom" style="width: 20%"> Niveau d'intervention <p-sortIcon
+              field="prenom"></p-sortIcon> </th>
+          <th pSortableColumn="telephone" style="width: 8%"> Telephone <p-sortIcon field="telephone"></p-sortIcon> </th>
+          <!--  <th pSortableColumn="etat" style="width: 6%"> {{ "Etat" | translate }}<p-sortIcon field="etat"></p-sortIcon> </th> -->
+          <th style="width: 14%" class="text-center"> <i class="pi pi-cog"></i> </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-use let-i="rowIndex">
+        <tr>
+          <td [ngClass]="{ actif: use.actif == 1 }" style="text-align: center">
+            <img src="assets/icons/userp.png" style="height: 30px; width:30px;" class="img-responsive mon-icon" />
+          </td>
+          <td [ngClass]="{ actif: use.actif == 1 }">{{ use.nom }}</td>
+          <td [ngClass]="{ actif: use.actif == 1 }">{{ use.prenom }}</td>
+          <td [ngClass]="{ actif: use.actif == 1 }">{{ use.email }}</td>
+          
+          <td [ngClass]="{ actif: use.actif == 1 }">{{ use.telephone }}</td>
+          <td [ngClass]="{ actif: use.actif == 1 }">
+            <i class="pi pi-pencil text-success action-btn" (click)="getUser(use, 'edit')" pTooltip="Modifier"
+              tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+            <i class="pi pi-eye text-secondary action-btn" (click)="getUser(use, 'view')" pTooltip="Consulter"
+              tooltipPosition="top"></i> &nbsp;&nbsp;&nbsp;&nbsp;
+            <i class="pi pi-trash text-danger action-btn" pTooltip="Supprimer" tooltipPosition="top"
+              (click)="confirmDel(use)"></i>
+            <span *ngIf="use.actif == 0"> &nbsp;&nbsp;&nbsp;&nbsp; <i class="pi pi-lock-open text-success action-btn"
+                pTooltip="Activer" tooltipPosition="top" (click)="confirmActivationForOne(use, 1)"></i> </span>
+            <span *ngIf="use.actif == 1"> &nbsp;&nbsp;&nbsp;&nbsp; <i class="pi pi-lock text-danger action-btn"
+                pTooltip="Desactiver" tooltipPosition="top" (click)="confirmActivationForOne(use, 0)"></i>
+            </span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <i class="fa fa-map-marker text-secondary action-btn" pTooltip="Définir le niveau d'intervention"
+               tooltipPosition="left"></i>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+</div>
+
+
+<p-dialog [(visible)]="dconfirmActionDialog" header="Confirm" [modal]="true" [style]="{ width: '30vw' }"
+  [draggable]="false" [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <label *ngIf="actif == 1" for="" class="text-center" style="font-size: 20px; font-weight: 700">{{ "confirmActif"
+          | translate }} </label>
+        <label *ngIf="actif == 0" for="" class="text-center" style="font-size: 20px; font-weight: 700">{{
+          "confirmDesActif" | translate }} </label>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center">
+      <button mat-raised-button color="secondary" (click)="hideActivation()">&nbsp;{{
+        "Annuler" | translate }}</button>&nbsp;&nbsp;
+      <button *ngIf="actif == 0" mat-raised-button class="btn-desactiver" (click)="updateState()"> <i
+          class="pi pi-lock"></i>&nbsp;{{ "Desactiver" | translate }} </button>
+      <button *ngIf="actif == 1" mat-raised-button class="btn-activer" (click)="updateState()"> <i
+          class="pi pi-lock-open"></i>&nbsp;{{ "Activer" | translate }} </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+
+
+<!-- Dialog pour les Suppressions -->
+<p-dialog header="{{ 'Suppression' | translate }}" [(visible)]="dialogDelete" [closable]="false" [modal]="true"
+  [style]="{ width: '30vw' }" [draggable]="false" [closable]="false" [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <img src="assets/icons/atention.png" style="height: 50px; width:50px;" class="img-responsive mon-icon" />&nbsp;
+        <h4 class="text-center text-danger" style="font-size: 20px; font-weight: 700; color: red">{{ "questSupress" |
+          translate }}</h4>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center">
+      <button mat-raised-button color="secondary" (click)="hideDeleteDialog()">&nbsp;{{
+        "Annuler" | translate }}</button>&nbsp;&nbsp;
+      <button mat-raised-button class="btn-delete" (click)="deleteList()">&nbsp;{{
+        "Supprimer" | translate }} </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<div class="progress-spinner" *ngIf="displaySpinner" style="z-index: 9999">
+  <div class="d-flex justify-content-center">
+    <p-progressSpinner styleClass="custom-spinner" strokeWidth="4" animationDuration=".5s"></p-progressSpinner>
+  </div>
+  <div class="d-flex justify-content-center affiche">
+    <h6 style="color: rgb(255, 255, 255); z-index: 999">
+      {{ "intraite" | translate }}
+    </h6>
+  </div>
+</div>
+<p-dialog header="{{ 'Erreur' | translate }}" [modal]="true" [(visible)]="displayError" [style]="{ width: '400px' }">
+  <div class="row">
+    <div class="col">
+      <div class="card-body">
+        <h6 class="text-danger">
+          <i class="fa fa-times fa-fw me-2 text-center text-danger"></i>
+          {{ errorMessage | translate }}
+        </h6>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="d-flex justify-content-end">
+      <button mat-raised-button class="btn-add" (click)="displayError = false">
+        {{ "Ok" | translate }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+
+<!-- --------------------------------------------editer Groupe -->
+<p-dialog [modal]="true" [(visible)]="userUpdateDialog" [style]="{ width: '40vw' }">
+  <ng-template pTemplate="header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col d-flex justify-content-start">
+          <h5> <img src="assets/icons/userp.png" style="height: 25px; width:25px;"
+              class="img-responsive mon-icon" />&nbsp;{{ libelle | translate }} <span class="text-primary"></span></h5>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="content">
+    <fieldset
+      style=" background-color: rgb(233, 244, 245); border: 1px solid gainsboro; padding: 5px; border-radius: 8px; margin-top: 1%; border-bottom: 4px solid rgb(39, 174, 241);">
+      <legend style="margin-top: -2.3%; font-size: 16px; font-weight: bold;" class="text-center">
+        <img src="assets/icons/userp.png" style="height: 100px; width:100px;" class="img-responsive mon-icon" />
+      </legend>
+      <div class="container">
+        <div class="row mb-2" style="margin-top: 1%;">
+          <div class="col-sm-12 col-lg-12 col-md-3 col-xl-3"> <label>Login&nbsp;<span
+                class="text-danger champ-obligatoire">*</span></label> </div>
+          <div class="col-sm-12 col-lg-12 col-md-9 col-xl-9">
+            <input [disabled]="actionUser=='view'" name="login" [(ngModel)]="userGlobal.user.login" type="text"
+              class="form-control form-control-sm" />
+            <small class="p-invalid" style="color: red" *ngIf="!userGlobal.user.login"> {{ "Username is required" |
+              translate }}</small>
+            <small class="p-invalid" style="color: red" *ngIf="duplicateUserName"> {{ "Duplicate username" | translate
+              }}</small>
+          </div>
+        </div>
+        <div class="row mb-2" style="margin-top: 1%;">
+          <label class="col-sm-12 col-md-12 col-lg-3 col-xl-3"> {{ "password" | translate }}&nbsp;<span
+              class="text-danger champ-obligatoire">*</span></label>
+          <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9">
+            <div class="input-group mb-3">
+              <input [disabled]="actionUser=='view' || actionUser=='edit' " name="password"
+                [(ngModel)]="userGlobal.user.password" type="password" class="form-control form-control-sm"
+                (ngModelChange)="validerPass()" [ngClass]="validerPass() ? ' is-valid' : 'is-invalid'"
+                id="passwordInput" />
+
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i pTooltip="{{ 'showPass' | translate }}" tooltipPosition="top" *ngIf="vue==false"
+                    class="pi pi-eye mon-icon" (click)="togglePasswordVisibility()"></i>
+                  <i pTooltip="{{ 'hidePass' | translate }}" tooltipPosition="top" *ngIf="vue==true"
+                    class="pi pi-eye-slash mon-icon" (click)="togglePasswordVisibility()"></i>
+                </span>
+              </div>
+            </div>
+            <small class="p-invalid" style="color: rgb(255, 136, 0)" *ngIf="!validerPass()"> {{ "passRegex" | translate
+              }}</small>
+          </div>
+        </div>
+        <div class="row mb-2" style="margin-top: 1%;">
+          <label class="col-sm-12 col-md-12 col-lg-3 col-xl-3"> {{ "confirmPass" | translate }}&nbsp;<span
+              class="text-danger champ-obligatoire">*</span></label>
+          <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9">
+            <div class="input-group mb-3">
+              <input [disabled]="actionUser=='view' || actionUser=='edit' " name="password" [(ngModel)]="confirmPass"
+                type="password" class="form-control form-control-sm" (ngModelChange)="getConfirm(confirmPass)"
+                [ngClass]="getConfirm(confirmPass) ? ' is-valid' : 'is-invalid'" id="passwordInputC" />
+
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i pTooltip="{{ 'showPass' | translate }}" tooltipPosition="top" *ngIf="vuec==false"
+                    class="pi pi-eye mon-icon" (click)="togglePasswordVisibilityCon()"></i>
+                  <i pTooltip="{{ 'hidePass' | translate }}" tooltipPosition="top" *ngIf="vuec==true"
+                    class="pi pi-eye-slash mon-icon" (click)="togglePasswordVisibilityCon()"></i>
+                </span>
+              </div>
+            </div>
+            <small class="p-invalid" style="color: rgb(255, 42, 0)" *ngIf="noSame==false"> {{ "difPass" | translate
+              }}</small>
+          </div>
+        </div>
+        <div class="row mb-2" style="margin-top: 1%;">
+          <label class="col-sm-12 col-md-12 col-lg-3 col-xl-3"> {{ "nom" | translate }}&nbsp;<span
+              class="text-danger champ-obligatoire">*</span></label>
+          <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9">
+            <input [disabled]="actionUser=='view'" name="nom" [(ngModel)]="userGlobal.user.nom" type="text"
+              class="form-control form-control-sm" />
+            <small class="p-invalid" style="color: red" *ngIf="!userGlobal.user.nom"> {{ "Nom requis" | translate
+              }}</small>
+          </div>
+        </div>
+        <div class="row mb-2" style="margin-top: 1%;">
+          <label class="col-sm-12 col-md-12 col-lg-3 col-xl-3"> {{ "prenom" | translate }}</label>
+          <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9"> <input [disabled]="actionUser=='view'" name="prenom"
+              [(ngModel)]="userGlobal.user.prenom" type="text" class="form-control form-control-sm" /> </div>
+        </div>
+        <div class="row mb-2" style="margin-top: 1%;">
+          <label class="col-sm-12 col-md-12 col-lg-3 col-xl-3 col-form-label"> {{ "telephone" | translate }}</label>
+          <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9">
+            <input [disabled]="actionUser=='view'" name="telephone" [(ngModel)]="userGlobal.user.telephone" type="text"
+              class="form-control form-control-sm" />
+            <small class="p-invalid" style="color: red" *ngIf="!userGlobal.user.telephone"> {{ "require phone" |
+              translate
+              }}</small>
+          </div>
+
+        </div>
+        <div class="row" style="margin-top: 1%">
+          <div class="col-md-3"> <label for="">Adresse Email&nbsp;<span
+                class="text-danger champ-obligatoire">*</span></label>
+          </div>
+          <div class="col-md-9">
+            <input [disabled]="actionUser=='view'" class="form-control" type="email" name="vendeuremail" id="vendeuremail"
+              #vendeuremail="ngModel" [ngClass]="{ 'is-invalid': vendeuremail.errors?.pattern }" vendeuremail required
+              [(ngModel)]="userGlobal.user.email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" />
+            <div *ngIf="vendeuremail.touched" class="invalid-feedback">
+              <div *ngIf="vendeuremail.errors?.pattern">{{ "invalidEmail" | translate }}</div>
+            </div>
+            
+          </div>
+        </div>
+        <div class="row mb-2 text-center" style="margin-top: 1%;">
+          <span class="rouge px-2 py-1 text-center" *ngIf="submitted && !allfields"> {{ "require some fields" |
+            translate }}</span>
+        </div>
+      </div>
+    </fieldset>
+
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="d-flex justify-content-center">
+      <button mat-raised-button color="secondary" (click)="userUpdateDialog = false">
+       
+        <span *ngIf="actionUser=='view'">{{ "Fermer" | translate }}</span>
+        <span *ngIf="actionUser!='view'">{{ "Annuler" | translate }}</span>
+      </button>&nbsp;&nbsp;
+      <button mat-raised-button
+        [disabled]="!userGlobal.user.email || !userGlobal.user.password || getConfirm(confirmPass)==false"
+        class="btn-add" *ngIf="actionUser!='view'" (click)="saveUser()">
+        
+        <span *ngIf="actionUser == 'new'">{{ "ajouter" | translate }}</span>
+        <span *ngIf="actionUser == 'edit'"> {{ "modifier" | translate }}:{{ userGlobal.user.login }} </span>
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- -------------------------------------------------------------------------------------- Sussess -------------------------------------------------------------------------------------- -->
+<p-dialog [(visible)]="successDialog" header="Confirmation" [modal]="true" [style]="{ width: '25vw' }"
+  [draggable]="false" [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <img src="assets/icons/ok.png" style="height: 50px; width:50px;" class="img-responsive mon-icon" />&nbsp;<h4
+          class="text-center text-success" style="font-size: 20px; font-weight: 700">{{ succesMessage | translate }}
+        </h4>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center">
+      <button mat-raised-button (click)="successDialog = false"> {{ "Ok" | translate }} </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- -------------------------------------------------------------------------------------- Error -------------------------------------------------------------------------------------- -->
+<p-dialog [(visible)]="errorDialog" header="Confirmation" [modal]="true" [style]="{ width: '25vw' }" [draggable]="false"
+  [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <img src="assets/icons/ko.png" style="height: 50px; width:50px;" class="img-responsive mon-icon" />&nbsp;<h4
+          class="text-center text-danger" style="font-size: 20px; font-weight: 700">{{ errorMessage | translate }}</h4>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center"> <button mat-raised-button (click)="errorDialog = false"> {{ "Ok" |
+        translate }} </button> </div>
+  </ng-template>
+</p-dialog>
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

@@ -1,0 +1,1332 @@
+<p-menu #menuOptions [model]="options" [popup]="true">
+    <ng-template pTemplate="item" let-item>
+        <span [ngStyle]="{ 'color': item.color }" pTooltip="{{ item.pTooltip |translate }}" tooltipPosition="top">
+            <i [class]="item.icon" [ngStyle]="{ 'color': item.color }"></i> &nbsp;
+            <span>{{ item.label | translate }}</span>
+        </span>
+    </ng-template>
+</p-menu>
+<p-menu #menuOptionCan [model]="options" [popup]="true">
+    <ng-template pTemplate="item" let-item>
+        <span [ngStyle]="{ 'color': item.color }" pTooltip="{{ item.pTooltip |translate }}" tooltipPosition="top">
+            <i [class]="item.icon" [ngStyle]="{ 'color': item.color }"></i> &nbsp;
+            <span>{{ item.label | translate }}</span>
+        </span>
+    </ng-template>
+</p-menu>
+
+<div class="row justify-content-center" *ngIf="pageByAction=='LIST'">
+    <div class="card bg-light border-0 cardRo" *ngIf="!planactions.length">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-4">
+                <img src="assets/elaboration.png" alt="" style="max-width: 100%; max-height: 100%;">
+            </div>
+            <div class="col-12 col-md-8">
+                <div class="container bouli">
+                    <div class="row justify-content-center">
+                        <div class="col-10">
+                            <h1>
+                                <i class="fas fa-map text-secondary"></i>&nbsp;
+                                <span style="text-align:justify">{{'statusElTit'|translate}}</span>
+                            </h1>
+                            <p>
+                                <span style="text-align:justify">{{'statusEldet'|translate}}</span>
+                            </p>
+                            <hr>
+                            <p class="text-warning"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;{{ 'pourFalla' |translate }}</p>
+                        </div>
+                        
+                    </div>
+                    
+                   
+                    <div class="row mt-1 justify-content-center align-items-center">
+                        <div class="col-10">
+                            <div class="row mt-1 justify-content-center align-items-center">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ "Millesime" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span></label>
+                                        <p-dropdown [(ngModel)]="exercice.millesime" [style]="{ width: '100%', height: '40px' }"
+                                            [showClear]="true" optionValue="millesime" [options]="exercices" optionLabel="libelleFr"
+                                            placeholder=" ">
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ "Organisations" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span></label>
+                                        <p-dropdown [disabled]="action=='view'" [(ngModel)]="organisation.organisationID" [style]="{ width: '100%', height: '40px' }" placeholder="{{ 'selOrg' |translate }}" [showClear]="true" [options]="organisations" optionLabel="libelleFr"
+                                            optionValue="organisationID" [filter]="true" filterBy="libelleFr" [showClear]="true" (onChange)="listMoPFAll(organisation.organisationID)">
+                                            <ng-template let-act pTemplate="item">
+                                                <div class="activite-item" (click)="listMoPFAll(act.organisationID)">
+                                                    <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                                    <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                                </div>
+                                            </ng-template>
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ "pf" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span></label>
+                                        <p-dropdown [disabled]="action=='view'" [(ngModel)]="pf.moPointFocaleID" [style]="{ width: '100%', height: '40px' }" placeholder="{{ 'selPf' |translate }}" [showClear]="true" [options]="pfs" optionLabel="designationFr" optionValue="moPointFocaleID"
+                                            [filter]="true" filterBy="designationFr" [showClear]="true" (onChange)="listStructureByPf(pf.moPointFocaleID)">
+                                            <ng-template let-act pTemplate="item">
+                                                <div class="activite-item" (click)="listStructureByPf(act.moPointFocaleID)">
+                                                    <span *ngIf="verifyLength(act.designationFr)" pTooltip="{{ act.designationFr }}" tooltipPosition="top"> {{ defineDescription(act.designationFr) }}... </span>
+                                                    <span *ngIf="verifyLength(act.designationFr) == false"> {{ act.designationFr }} </span>
+                                                </div>
+                                            </ng-template>
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-1 mt-4">
+                                    <p-button [disabled]="!organisation.organisationID || !pf.moPointFocaleID" [style]="{ height: '35px' }" icon="fas fa-redo-alt" (click)="listStructureByPf(pf.moPointFocaleID)" styleClass="p-button-secondary"> </p-button>
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12 col-md-6">
+                                    <button [disabled]="!organisation.organisationID" (click)="uploadPA()" type="button" class="btn btn-lg btn-outline-dark">
+                                        <i class="fas fa-upload"></i>&nbsp; {{ 'importer' | translate }}&nbsp;{{ 'anplanAction'| translate }}
+                                    </button>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <button [disabled]="!organisation.organisationID" (click)="create()" type="button" class="btn btn-lg btn-outline-primary">
+                                        <i class="fas fa-plus"></i>&nbsp; {{ 'nouveau' | translate }}&nbsp;{{ 'planAction'| translate }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div *ngIf="planactions.length">
+        <div class="card border-0 cont bg-light"> 
+            <div class="row align-items-center">
+                <div class="col-12 col-md-3">
+                    <div class="form-group">
+                        <label>{{ "Millesime" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span>
+                        </label>
+                        <p-dropdown [(ngModel)]="exercice.millesime" [style]="{ width: '100%', height: '40px' }"
+                            [showClear]="true" optionValue="millesime" [options]="exercices" optionLabel="libelleFr"
+                            placeholder=" ">
+                        </p-dropdown>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <div class="form-group">
+                        <label>{{ "Organisations" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                        <p-dropdown [disabled]="action=='view'" [(ngModel)]="organisation.organisationID" [style]="{ width: '100%', height: '40px' }" placeholder="{{ 'selOrg' |translate }}" [showClear]="true" [options]="organisations" optionLabel="libelleFr"
+                            optionValue="organisationID" [filter]="true" filterBy="libelleFr" [showClear]="true" (onChange)="listMoPFAll(organisation.organisationID)">
+                            <ng-template let-act pTemplate="item">
+                                <div class="activite-item" (click)="listMoPFAll(act.organisationID)">
+                                    <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                    <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="form-group">
+                        <label>{{ "pf" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                        <p-dropdown [disabled]="action=='view'" [(ngModel)]="pf.moPointFocaleID" [style]="{ width: '100%', height: '40px' }" placeholder="{{ 'selPf' |translate }}" [showClear]="true" [options]="pfs" optionLabel="designationFr" optionValue="moPointFocaleID"
+                            [filter]="true" filterBy="designationFr" [showClear]="true" (onChange)="listStructureByPf(pf.moPointFocaleID)">
+                            <ng-template let-act pTemplate="item">
+                                <div class="activite-item" (click)="listStructureByPf(act.moPointFocaleID)">
+                                    <span *ngIf="verifyLength(act.designationFr)" pTooltip="{{ act.designationFr }}" tooltipPosition="top"> {{ defineDescription(act.designationFr) }}... </span>
+                                    <span *ngIf="verifyLength(act.designationFr) == false"> {{ act.designationFr }} </span>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </div>
+                </div>
+                <div class="col-12 col-md-1 mt-3">
+                    <p-button [disabled]="!organisation.organisationID || !pf.moPointFocaleID" [style]="{ height: '35px' }" icon="fas fa-search" (click)="listStructureByPf(pf.moPointFocaleID)" styleClass="p-button-secondary"> </p-button>
+                </div>
+                <div class="col-12 col-md-3 mt-3 d-flex justify-content-end">
+                    <p-button [disabled]="!organisation.organisationID" [style]="{ height: '35px' }" icon="fas fa-upload" (click)="uploadPA()" label="{{ 'importer' | translate }}" styleClass="p-button-secondary"> </p-button>&nbsp;
+                    <button [disabled]="!organisation.organisationID" (click)="create()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Nouveau' | translate }}" icon="fas fa-plus" iconPos="left" class="p-button-primary"></button>
+                </div>
+            </div>
+        </div>
+        <div class="border-none push-right" style="padding: 0.5%; margin-top: -0.3;">
+            <i class="fas fa-search"></i>&nbsp;&nbsp;
+            <input pInputText pInputText type="text" style="width: 90%" (input)=" dt.filterGlobal($any($event.target).value, 'contains') " placeholder="Rechercher de la liste..." />
+        </div>
+        <div class="card mb-1">
+            <p-table #dt [value]="planactions" styleClass="p-datatable-sm" [paginator]="true" currentPageReportTemplate="Affichage {first} à {last} sur {totalRecords} plans d'actions" [showCurrentPageReport]="true" [rows]="50" [rowsPerPageOptions]="[10,25,50,100,125]"
+                [globalFilterFields]="['moPlanTravailID', 'libelleFr', 'libelleUs', 'organisationID', 'structureID', 'millesime', 'description', 'last_update', 'user_update', 'ip_update', 'created_at', 'created_by',]" [(selection)]="selectedPa" selectionMode="single" [tableStyle]="{'min-width': '50rem'}" [rowHover]="true" dataKey="rhCandidatureID">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th colspan="1" style="width: 3%; text-align: center">N°</th>
+                        <th colspan="1" style="width: 20%;">{{ 'libelleStructure'|translate }}</th>
+                        <th colspan="1" style="width: 24%;">{{ 'libelleFr'|translate }}</th>
+                        <th colspan="1" style="width: 10%;">{{ 'nbActivite'|translate }}</th>
+                        <th colspan="1" style="width: 15%;">{{ 'responsable'|translate }}</th>
+                        <th colspan="1" style="width: 15%;">{{ 'lastupdate'|translate }}</th>
+                        <th colspan="1" style="width: 10%;" class="text-center">{{ 'Etat'|translate }} </th>
+                        <th colspan="1" style="width: 3%;" class="text-center"> <i class="fas fa-cog"></i> </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-item let-i="rowIndex">
+                    <tr>
+                        <td>{{i+1}}</td>
+                        <td (click)="getPA(item, 'edit')">{{ item.libelleStructure }}</td>
+                        <td (click)="getPA(item, 'edit')">{{ item.libelleFr }}</td>
+                        <td class="text-center" (click)="getPA(item, 'edit')">
+                            <p-tag severity="primary" [value]="item.nbActivite" [rounded]="true"></p-tag>
+                        </td>
+                        <td (click)="getPA(item, 'edit')">{{ item.responsable }}</td>
+                        <td (click)="getPA(item, 'edit')">{{ item.last_update|date:'longDate' }}</td>
+                        <td (click)="getPA(item, 'edit')" class="text-center">
+                            <span [ngClass]="{'enatente':item.etat==0, 'valide':item.etat==10}">
+                                <span *ngIf="item.etat==0">{{ 'enatente'|translate }}</span>
+                                <span *ngIf="item.etat==10">{{ 'valide'|translate }}</span>
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+                            <i (click)="onDropdown1(item); menuOptions.toggle($event)"
+                                class="fas fa-ellipsis-h elemnt" pTooltip="Actions" tooltipPosition="left">
+                            </i>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid texte" *ngIf="pageByAction=='UPLOADPA'">
+    <div class="row justify-content-center">
+        <div class="row mb-2 mt-1 align-items-center">
+            <div class="col-12 col-md-6">
+                <i class="fas fa-circle-left" (click)="getList()" style="font-size: 25px;" pTooltip="{{ 'backTo' | translate }}" tooltipPosition="top"></i>&nbsp;&nbsp;
+                <span [ngClass]="acte==1 ? 'text-primary' : 'actionNonCOurs'" class="font-weight-bold titAction"> {{ actionPA | translate }} </span>
+            </div>
+            <div class="col d-flex justify-content-end">
+                <button (click)="close()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left" class="p-button-secondary"> </button> &nbsp;&nbsp;
+                <button [disabled]="!uploadedFile || !pa.libelleFr || !structureplans.length" *ngIf="action!='view'" (click)="savePlan()" style="float: right;" pButton pRipple type="button" [style]="{ height: '35px' }" label="{{ 'savePlan' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-success"></button>
+            </div>
+        </div>
+        <div class="pr-3 pl-3">
+            <div class="row">
+                <div class="card shadow-sm border-0 p-2">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">{{'intituleFr' |translate}}</label>
+                                <input [readonly]="action=='view'" type="text" [(ngModel)]="pa.libelleFr" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">{{'intituleUs' |translate}}</label>
+                                <input [readonly]="action=='view'" type="text" [(ngModel)]="pa.libelleUs" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-group">
+                                <label>{{ "Structures" |translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                <p-multiSelect [disabled]="action=='view'" [options]="structures" [(ngModel)]="structureplans" [style]="{width:'100%'}"
+                                    defaultLabel="{{ 'selStructure' |translate }}" [filter]="true" filterBy="abbreviationFr, libelleFr" [showClear]="true"
+                                    optionLabel="libelleFr" optionValue="structureID" display="chip">
+                                    <ng-template let-act pTemplate="item">
+                                        <div class="activite-item">
+                                            <span style="font-weight: bold;">({{act.abbreviationFr}})</span>&nbsp;
+                                            <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                            <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                        </div>
+                                    </ng-template>
+                                </p-multiSelect>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-1">
+                <div class="card shadow-sm border-0 p-2">
+                    <div class="card">
+                        <div class="container text-center">
+                            <h1>{{'vsupa' |translate}}</h1>
+                            <div class="row">
+                                <div class="col-md-10 mx-auto">
+                                    <section>
+                                        <div *ngIf="!fileUploaded" id="fuploader2" class="file-uploader px-2 py-3" (dragover)="onDragOver($event)"
+                                             (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
+                                            <input type="file" #fileInput accept="application/pdf" (change)="onFileSelected($event)" style="display: none;" />
+                                            <div class="icon-container mb-2 mx-auto d-flex justify-content-center align-items-center">
+                                                <span class="fa-stack fa-lg">
+                                                    <span class="primary-icon fas fa-file-pdf fa-stack-2x"></span>
+                                                    <span class="downloading-icon fa-chevron-circle-down fas fa-stack-1x" [ngClass]="{'fa-circle-error': fileTypeError}"> </span>
+                                                </span>
+                                            </div>
+                                            <div class="file-uploader-body mb-2">
+                                                <p class="file-upload-instructions">
+                                                    <a>{{ 'chudoc' | translate }}</a>
+                                                    <span class="hide-non-touch">{{ 'draganddrop' | translate }}</span>
+                                                </p>
+                                                <p class="drop-cta" [attr.data-defaultText]="defaultText" [attr.data-file-type-error]="fileTypeError ? 'File type must be PDF' : ''"> {{ dropText }} </p>
+                                            </div>
+                                        </div>
+                                    
+                                        <div *ngIf="fileUploaded">
+                                            <p-button [style]="{ height: '35px' }" icon="fas fa-trash" (click)="removeFile()" label="{{ 'removeFile' | translate }}" styleClass="p-button-danger p-button-text"> </p-button>
+                                            <div class="progress mt-2" *ngIf="uploadProgress > 0">
+                                                <div class="progress-bar" role="progressbar" [style.width.%]="uploadProgress" [ngClass]="{'bg-success': uploadProgress === 100, 'bg-info': uploadProgress < 100}" 
+                                                     aria-valuemin="0" aria-valuemax="100"> {{ uploadProgress }}% </div>
+                                            </div>
+                                            <iframe class="mt-2" *ngIf="pdfUrl" [src]="pdfUrl" width="100%" height="600px" style="border: none;"></iframe>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid texte" *ngIf="pageByAction=='CREATEPA'">
+    <div class="row justify-content-center">
+        <div class="row mb-2 mt-1 align-items-center">
+            <div class="col-12 col-md-6">
+                <i class="fas fa-circle-left" (click)="getList()" style="font-size: 25px;" pTooltip="{{ 'backTo' | translate }}" tooltipPosition="top"></i>&nbsp;&nbsp;
+                <span [ngClass]="acte==1 ? 'text-primary' : 'actionNonCOurs'" class="font-weight-bold titAction"> {{ actionPA | translate }} </span>
+            </div>
+            <div class="col d-flex justify-content-end">
+                <button (click)="close()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left" class="p-button-secondary"> </button> &nbsp;&nbsp;
+                <button *ngIf="action!='view'" (click)="savePlan()" style="float: right;" pButton pRipple type="button" [style]="{ height: '35px' }" label="{{ 'savePlan' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-success"></button>
+            </div>
+        </div>
+        <div class="pr-3 pl-3">
+            <div class="row">
+                <div class="card shadow-sm border-0 p-2">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">{{'intituleFr' |translate}}</label>
+                                <input [readonly]="action=='view'" type="text" [(ngModel)]="pa.libelleFr" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">{{'intituleUs' |translate}}</label>
+                                <input [readonly]="action=='view'" type="text" [(ngModel)]="pa.libelleUs" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-group">
+                                <label>{{ "StructuresOfPA" |translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                <p-multiSelect [disabled]="action=='view'" [options]="structures" [(ngModel)]="structureplans" [style]="{width:'100%'}"
+                                    defaultLabel="{{ 'selStructure' |translate }}" [filter]="true" filterBy="abbreviationFr, libelleFr" [showClear]="true"
+                                    optionLabel="libelleFr" optionValue="structureID" display="chip">
+                                    <ng-template let-act pTemplate="item">
+                                        <div class="activite-item">
+                                            <span style="font-weight: bold;">({{act.abbreviationFr}})</span>&nbsp;
+                                            <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                            <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                        </div>
+                                    </ng-template>
+                                </p-multiSelect>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-1">
+                <div class="card shadow-sm border-0 p-2">
+                    <div class="row mb-2 mt-1 align-items-center">
+                        <div class="col-12 col-md-2">
+                            <span class="titreCard"> {{'Affichage' |translate}} </span>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" [checked]="show == 1" [(ngModel)]="show" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="1">
+                                <label class="form-check-label" for="inlineRadio1">{{'Hierarchique' |translate}}</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" [checked]="show == 2" [(ngModel)]="show" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="2">
+                                <label class="form-check-label" for="inlineRadio2">{{'toList' |translate}}</label>
+                            </div>
+                        </div>
+                        <div class="col d-flex justify-content-end">
+                            <p-button pTooltip="Actualiser" tooltipPosition="top" [style]="{ height: '35px' }" icon="fas fa-redo-alt er" (click)="listPl(pa.moPlanTravailID); listMoARAlla(pa.moPlanTravailID);" styleClass="p-button-secondary"> </p-button>&nbsp;
+                            <p-button *ngIf="pa.mode==1" [disabled]="actionPA=='newPA' || !files.length" [style]="{ height: '35px' }" icon="fas fa-eye" (click)="onDownload(files[0].name)" label="{{ 'visualiserPA' | translate }}" styleClass="p-button-secondary"> </p-button>&nbsp;
+                            <p-button *ngIf="pa.mode==1" [disabled]="actionPA=='newPA' || !arbre.length" [style]="{ height: '35px' }" icon="fas fa-print" (click)="exporterPA()" label="{{ 'exporterPAdusysteme' | translate }}" styleClass="p-button-secondary"> </p-button>&nbsp;
+                            <p-button *ngIf="pa.mode==2" [disabled]="actionPA=='newPA'" [style]="{ height: '35px' }" icon="fas fa-print" (click)="exporterPA()" label="{{ 'exporterPA' | translate }}" styleClass="p-button-secondary"> </p-button>&nbsp;
+                            <p-button [style]="{ height: '35px' }" icon="fas fa-plus" (click)="createAR()" label="{{ 'nouveau' | translate }}" styleClass="p-button-primary"> </p-button>&nbsp;
+                        </div>
+                    </div>
+                    <div class="card" *ngIf="show==1">
+                        <p-treeTable #tt [value]="arbre" [columns]="col" styleClass="p-treetable-sm"
+                            [resizableColumns]="true" selectionMode="single" [rows]="10" [totalRecords]="1000" [scrollable]="false"
+                            scrollHeight="65vh" [(selection)]="selectedNode1" (onNodeSelect)="nodeSelect($event)"
+                            (onNodeUnselect)="nodeUnselect($event)" (onNodeExpand)="onNodeExpand($event)">
+                            <ng-template pTemplate="header" let-columns>
+                                <tr style="font-size: 14px;">
+                                    <th *ngFor="let col of columns" ttResizableColumn [attr.colspan]="col.header=='Designation'? 5 :  1" [ngClass]="{'float-right': col.header=='Actions'}"> {{col.header}} </th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-columns="columns">
+                                <tr [ttRow]="rowNode" [ttSelectableRow]="rowNode" class="petit" [ngClass]="{'action-row': rowData.niveauActiviteID == 2 && rowData.activiteID!=selectID,
+                                    'activite-row': rowData.niveauActiviteID == 3  && rowData.activiteID!=selectID,
+                                    'tache-row': rowData.niveauActiviteID == 4  && rowData.activiteID!=selectID}">
+
+                                    <td colspan="1" pTooltip="{{rowData.niveauActiviteID}}" tooltipPosition="left" class="niveau">
+                                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                                    </td>
+                                    <td class="text-center" colspan="1">
+                                        <span>{{rowData.code}}</span>
+                                        <span *ngIf="!rowData.niveauActiviteID" class="fw-bold">{{defineType(rowData.niveauActiviteID) }} </span>
+                                    </td>   
+                                    <td colspan="5">{{rowData.libelleFr}}</td>
+                                    <td colspan="1">
+                                        <span *ngIf="verifyLengthRec(rowData.objectif)" pTooltip="{{rowData.objectif}}" tooltipPosition="top"> {{ defineDescriptionRec(rowData.objectif) }}... </span>
+                                        <span *ngIf="!verifyLengthRec(rowData.objectif)"> {{ rowData.objectif }} </span>
+                                    </td>
+                                    <td colspan="1">
+                                        <span *ngIf="verifyLengthRec(rowData.indicateur)" pTooltip="{{rowData.indicateur}}" tooltipPosition="top"> {{ defineDescriptionRec(rowData.indicateur) }}... </span>
+                                        <span *ngIf="!verifyLengthRec(rowData.indicateur)"> {{ rowData.indicateur }} </span>
+                                    </td>
+                                    <td colspan="1">{{rowData.dateDebut| date: 'dd-MM-yyyy'}}</td>
+                                    <td colspan="1">{{rowData.dateFin| date: 'dd-MM-yyyy'}}</td>
+                                    <td [ngClass]="{'fw-bold': !rowData.niveauActiviteID}" colspan="1">
+                                       <span *ngIf="!rowData.niveauActiviteID"> {{rowData.montant ? rowData.montant.toLocaleString() : ''}}</span>
+                                    </td>
+                                    <td colspan="1">
+                                        <span class="float-right">
+                                            <i *ngIf="rowData.niveauActiviteID && rowData.niveauActiviteID==4" (click)="convertAR(rowData)" class="fas fa-share elemntf" pTooltip="{{ 'convertAR' | translate }}" tooltipPosition="top"> </i>&nbsp;&nbsp;
+                                            <i *ngIf="rowData.niveauActiviteID && rowData.niveauActiviteID==4" (click)="createAR(rowData)" class="fas fa-plus elemntf" pTooltip="{{ 'newAR' | translate }}" tooltipPosition="top"> </i>
+                                            <i *ngIf="!rowData.niveauActiviteID" (click)="onDropdown(rowData); menuOptions.toggle($event)" class="fas fa-ellipsis-h elemnt" pTooltip="Actions" tooltipPosition="left"> </i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage" let-columns>
+                                <tr> <td [attr.colspan]="columns.length"> Aucun Enregistrement trouvé </td> </tr>
+                            </ng-template>
+                        </p-treeTable>
+                    </div>
+                    <div class="card" *ngIf="show==2">
+                        <p-table #dt [value]="activitesAR" styleClass="p-datatable-sm" [paginator]="true" currentPageReportTemplate="Affichage {first} à {last} sur {totalRecords} activités à réaliser" [showCurrentPageReport]="true" [rows]="50" [rowsPerPageOptions]="[10,25,50,100,125]"
+                            [globalFilterFields]="[ 'moniActiviteARealiserID', 'moPlanTravailID', 'structureID', 'spID', 'actionID', 'activiteID', 'tacheID', 'dateDebut', 'dateFin',
+                                'raciID', 'modeContractualisation', 'reference', 'cible', 'poids', 'taux', 'echeance', 'cout', 'statut', 'offline', 'frequence', 'libelleFr', 'libelleUs',]" 
+                            [(selection)]="selectedPa" selectionMode="single" [tableStyle]="{'min-width': '50rem'}" [rowHover]="true" dataKey="moniActiviteARealiserID">
+                        <ng-template pTemplate="header">
+                            <tr style="font-size: 14px;">
+                                <th colspan="1" style="width: 3%; text-align: center">N°</th>
+                                <th colspan="1" style="width: 20%;">{{ 'codeTa'|translate }}</th>
+                                <th colspan="1" style="width: 2cqb;">{{ 'intituleFr'|translate }}</th>
+                                <th colspan="1" style="width: 10%;">{{ 'nbOperation'|translate }}</th>
+                                <th colspan="1" style="width: 10%;">{{ 'Debut'|translate }}</th>
+                                <th colspan="1" style="width: 10%;">{{ 'Fin'|translate }}</th>
+                                <th colspan="1" style="width: 10%;" class="text-right">{{ 'Coût'|translate }} </th>
+                                <th colspan="1" style="width: 10%;" class="text-center">{{ 'Etat'|translate }} </th>
+                                <th colspan="1" style="width: 3%;" class="text-center"> <i class="fas fa-cog"></i> </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-item let-i="rowIndex">
+                            <tr style="font-size: 13px;">
+                                <td>{{i+1}}</td>
+                                <td (click)="getAR(item, 'edit')">{{ item.codeTa }}</td>
+                                <td (click)="getAR(item, 'edit')">{{ item.libelleFr }}</td>
+                                <td (click)="getAR(item, 'edit')" class="text-center" (click)="getPA(item, 'edit')">
+                                    <p-tag severity="primary" [value]="item.nbOperation" [rounded]="true"></p-tag>
+                                </td>
+                                <td (click)="getAR(item, 'edit')">{{ item.dateDebut|date:'longDate' }}</td>
+                                <td (click)="getAR(item, 'edit')">{{ item.dateFin|date:'longDate' }}</td>
+                                <td (click)="getAR(item, 'edit')" class="text-right fw-bold">{{ item.montant ? item.montant.toLocaleString() : 0 }}</td>
+                                <td (click)="getAR(item, 'edit')" class="text-center">
+                                    <span (click)="getAR(item, 'edit')" [ngClass]="{'enatente':item.etat==0, 'valide':item.etat==10}">
+                                        <span *ngIf="item.etat==0">{{ 'enrealisation'|translate }}</span>
+                                        <span *ngIf="item.etat==10">{{ 'valide'|translate }}</span>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <i (click)="onDropdown(item); menuOptions.toggle($event)"
+                                        class="fas fa-ellipsis-h elemnt" pTooltip="Actions" tooltipPosition="left">
+                                    </i>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid texte" *ngIf="pageByAction=='CREATEAR'">
+    <div class="row justify-content-center">
+        <div class="card border-0 cont bg-light">
+            <div class="row mb-2 mt-1 align-items-center">
+                <div class="col-12 col-md-6">
+                    <i class="fas fa-circle-left" (click)="back(1)" style="font-size: 25px;" pTooltip="{{ 'backTo' | translate }}" tooltipPosition="top"></i>&nbsp;&nbsp;
+                    <span (click)="back(1)" pTooltip="{{ 'backToPA' | translate }}" tooltipPosition="top" [ngClass]="acte==1 ? 'text-primary' : 'actionNonCOurs'" class="font-weight-bold titAction"> {{ actionPA | translate }} </span>&nbsp;
+                    <span class="font-weight-bold text-primary titAction"> <i class="fas fa-chevron-right"></i> </span>&nbsp;
+                    <span [ngClass]="acte==2 ? 'text-primary' : 'actionNonCOurs'" class="font-weight-bold titAction"> {{ actionAR | translate }} </span>
+                </div>
+                <div class="col d-flex justify-content-end">
+                    <p-button [style]="{ height: '35px' }" icon="fas fa-print" (click)="printFiche(modeA)" label="{{ 'exporterRA' | translate }}" styleClass="p-button-secondary"> </p-button>&nbsp;
+                    <button (click)="back(1)" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left" class="p-button-secondary"> </button>
+                    &nbsp;&nbsp;
+                    <button [disabled]="!activiteAR.libelleFr || !activiteAR.libelleUs" (click)="saveActivite()" style="float: right;" pButton pRipple type="button" [style]="{ height: '35px' }"
+                        label="{{ 'saveActivite' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-success"></button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-5">
+                <div class="row justify-content-center">
+                    <div class="row" *ngIf="wit">
+                        <div class="form-group">
+                            <label>{{ "SP" |translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                            <p-dropdown [disabled]="action=='view'" [(ngModel)]="activiteAR.spID" [style]="{ width: '100%', height: '40px' }"
+                                placeholder="{{ 'selSP' |translate }}" [showClear]="true" [options]="sousprogrammes" optionLabel="libelleFr" optionValue="activiteID" [filter]="true" filterBy="libelleFr"
+                                [showClear]="true" (onChange)="onSelectActivite(activiteAR.spID, sousprogrammes)">
+                                <ng-template let-act pTemplate="item">
+                                    <div class="activite-item" (click)="onSelectActivite(act.activiteID, sousprogrammes)">
+                                        <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                        <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                    </div>
+                                </ng-template>
+                            </p-dropdown>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="wit">
+                        <div class="form-group">
+                            <label>{{ "Actions" |translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                            <p-dropdown [disabled]="action=='view'" [(ngModel)]="activiteAR.actionID" [style]="{ width: '100%', height: '40px' }"
+                                placeholder="{{ 'selActions' |translate }}" [showClear]="true" [options]="actions" optionLabel="libelleFr" optionValue="activiteID" [filter]="true" filterBy="libelleFr"
+                                [showClear]="true" (onChange)="onSelectActivite(activiteAR.actionID, actions)">
+                                <ng-template let-act pTemplate="item">
+                                    <div class="activite-item" (click)="onSelectActivite(act.activiteID, actions)">
+                                        <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                        <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                    </div>
+                                </ng-template>
+                            </p-dropdown>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="wit">
+                        <div class="form-group">
+                            <label>{{ "Activites" |translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                            <p-dropdown [disabled]="action=='view'" [(ngModel)]="activiteAR.activiteID" [style]="{ width: '100%', height: '40px' }"
+                                placeholder="{{ 'selActivites' |translate }}" [showClear]="true" [options]="activites" optionLabel="libelleFr" optionValue="activiteID" [filter]="true" filterBy="libelleFr"
+                                [showClear]="true" (onChange)="onSelectActivite(activiteAR.activiteID, activites)">
+                                <ng-template let-act pTemplate="item">
+                                    <div class="activite-item" (click)="onSelectActivite(act.activiteID, activites)">
+                                        <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                        <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                    </div>
+                                </ng-template>
+                            </p-dropdown>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="wit">
+                        <div class="form-group">
+                            <label>{{ "Taches" |translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                            <p-dropdown [disabled]="action=='view'" [(ngModel)]="activiteAR.tacheID" [style]="{ width: '100%', height: '40px' }" placeholder="{{ 'selTaches' |translate }}" [showClear]="true"
+                                [options]="taches" optionLabel="libelleFr" optionValue="activiteID" [filter]="true" filterBy="libelleFr" [showClear]="true" 
+                                (onChange)="onSelectTache(activiteAR.tacheID)">
+                                <ng-template let-act pTemplate="item">
+                                    <div class="activite-item" (click)="onSelectTache(act.activiteID)">
+                                        <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                        <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                    </div>
+                                </ng-template>
+                            </p-dropdown>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="">{{'intituleFr' |translate}}</label>
+                            <textarea [readonly]="actionOb=='view'" type="text" [(ngModel)]="activiteAR.libelleFr" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="">{{'intituleUs' |translate}}</label>
+                            <textarea [readonly]="actionOb=='view'" type="text" [(ngModel)]="activiteAR.libelleUs" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+                            <div class="form-group">
+                                <label for="">{{'dateDebut' |translate}}</label>
+                                <input type="datetime-local" [(ngModel)]="activiteAR.dateDebut" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-group">
+                                <label for="">{{'dateFin' |translate}}</label>
+                                <input type="datetime-local" [(ngModel)]="activiteAR.dateFin" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-group">
+                                <label for="">{{'echeance' |translate}}</label>
+                                <input type="date" [(ngModel)]="activiteAR.echeance" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>{{ "Mode de contractualisation" | translate }}<span
+                                    class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span>
+                            </label>
+                            <p-dropdown [(ngModel)]="activiteAR.modeContractualisation"
+                                [style]="{ width: '100%', height: '40px' }" [showClear]="true"
+                                optionValue="label" [options]="modes" optionLabel="label"
+                                placeholder="{{'vsumoc' |translate}}">
+                            </p-dropdown>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ "reference" | translate }}</label>
+                                <input type="number" [(ngModel)]="activiteAR.reference" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ "cible" | translate }}</label>
+                                <input type="number" [(ngModel)]="activiteAR.cible" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-7" style="border-left:1px solid rgb(186, 186, 186)">
+                <div class="container-fluid texte" *ngIf="objectifPage">
+                    <div class="row mt-1 justify-content-center">
+                        <div class="card border-0 cont bg-light">
+                            <div class="row mt-1 align-items-center">
+                                <div class="col d-flex justify-content-start">
+                                    <span class="font-weight-bold titreCard"> {{ actionOb+'OB' | translate }} </span>
+                                </div>
+                                <div class="col d-flex justify-content-end">
+                                    <button (click)="back(4)" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left" class="p-button-text p-button-secondary"> </button> &nbsp;&nbsp;
+                                    <button *ngIf="actionOb!='view'" [disabled]="!objectif.libelleFr || !objectif.libelleUs" (click)="saveObjectif()" style="float: right;" pButton pRipple type="button" [style]="{ height: '35px' }"
+                                        label="{{ 'saveObjectif' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-text p-button-success"></button>
+                                </div>
+                            </div>
+                            <div class="modal-body p-2">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="">{{'Code' |translate}}</label>
+                                            <input [readonly]="true" type="text" [(ngModel)]="objectif.code" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <label for="">{{'intituleFr' |translate}}</label>
+                                        <textarea [readonly]="actionOb=='view'" type="text" [(ngModel)]="objectif.libelleFr" class="form-control" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <label for="">{{'intituleUs' |translate}}</label>
+                                        <textarea [readonly]="actionOb=='view'" type="text" [(ngModel)]="objectif.libelleUs" class="form-control" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="">{{'Description' |translate}}</label>
+                                            <textarea [readonly]="actionOb=='view'" type="text" [(ngModel)]="objectif.description" class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-md-12">
+                                        <div class="row align-items-center">
+                                            <div class="alert alert-warning" role="alert" *ngIf="!objectif.indicateurs.length">
+                                                <h4 class="alert-heading"><i class="fas fa-meh"></i>&nbsp;&nbsp;{{ 'notingInd' |translate }}</h4>
+                                                <p>{{ 'piapaInd' |translate }}</p>
+                                                <button (click)="createIndicateur()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Nouvel' | translate }}&nbsp;{{ 'Indicateur'| translate }}" icon="fas fa-plus" iconPos="left" class="p-button-primary"></button>
+                                            </div>
+                                            <div class="card" *ngIf="objectif.indicateurs.length">
+                                                <div class="row mb-2 mt-1 align-items-center">
+                                                    <div class="col-12 col-md-8"> 
+                                                        <span class="titreCard">{{ "Indicateur(s)" | translate }}</span>
+                                                    </div>
+                                                    <div class="col d-flex justify-content-end">
+                                                        <button (click)="createIndicateur()" [style]="{ height: '30px' }" pButton pRipple type="button" label="{{ 'nouveau' | translate }}" icon="fas fa-plus-circle" iconPos="left" class="p-button-text p-button-primary"></button>
+                                                    </div>
+                                                </div>
+                                                <div class="card" *ngIf="objectif.indicateurs.length">
+                                                    <p-table #dt [value]="objectif.indicateurs" [rowHover]="true" dataKey="moMemoireDepenseID"  styleClass="p-datatable-sm">
+                                                        <ng-template pTemplate="header">
+                                                            <tr>
+                                                                <th style="width: 3rem; text-align: center">N°</th>
+                                                                <th>{{'Code'|translate}}</th>
+                                                                <th>{{'LibelleFr'|translate}}</th>
+                                                                <th>{{'Reference'|translate}}</th>
+                                                                <th>{{'Cible'|translate}}</th>
+                                                                <th style="width: 3rem; text-align: center"><i class="fas fa-cog"></i></th>
+                                                            </tr>
+                                                        </ng-template>
+                                                        <ng-template pTemplate="body" let-item let-i="rowIndex">
+                                                            <tr style="font-size:13px">
+                                                                <td (click)="getIndicateur(item, 'edit')">{{i+1}}</td>
+                                                                <td (click)="getIndicateur(item, 'edit')">{{ item.code }}</td>
+                                                                <td (click)="getIndicateur(item, 'edit')">{{ item.libelleFr }}</td>
+                                                                <td (click)="getIndicateur(item, 'edit')">{{ item.reference }}</td>
+                                                                <td (click)="getIndicateur(item, 'edit')">{{ item.cible }}</td>
+                                                                <td style="width: 3rem; text-align: center">
+                                                                    <i (click)="remove(item, objectif.indicateurs)" pTooltip="{{'Supprimer'|translate}}" tooltipPosition="top" class="fas fa-trash er" style="font-size: 20px; color: rgb(234, 66, 28);"></i>&nbsp;&nbsp;
+                                                                </td>
+                                                            </tr>
+                                                        </ng-template>
+                                                    </p-table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid texte" *ngIf="operationPage">
+                    <div class="row mt-1 justify-content-center">
+                        <div class="card border-0 cont bg-light">
+                            <div class="row mt-1 align-items-center">
+                                <div class="col d-flex justify-content-start">
+                                    <span class="font-weight-bold titreCard"> {{ actionOP | translate }} </span>
+                                </div>
+                                <div class="col d-flex justify-content-end">
+                                    <button (click)="back(4)" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left" class="p-button-text p-button-secondary"> </button> &nbsp;&nbsp;
+                                    <button [disabled]="!operation.libelleFr || !operation.libelleUs" (click)="saveOperation(operation)" style="float: right;" pButton pRipple type="button" [style]="{ height: '35px' }"
+                                        label="{{ 'enregistrer' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-text p-button-success"></button>
+                                </div>
+                            </div>
+                            <div class="modal-body p-2">
+                                <div class="row">
+                                    <div class="form-group">
+                                        <label for="">{{'intituleFr' |translate}}</label>
+                                        <textarea type="text" [(ngModel)]="operation.libelleFr" class="form-control" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <label for="">{{'intituleUs' |translate}}</label>
+                                        <textarea type="text" [(ngModel)]="operation.libelleUs" class="form-control" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                <div class="card p-2">
+                                    <div class="row mb-2 mt-1 align-items-center">
+                                        <div class="col-12 col-md-8"> 
+                                            <span class="titreCard">{{ "comptescouts" | translate }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="">{{'Compte' |translate}}</label>
+                                                <p-dropdown [disabled]="action=='view'" [(ngModel)]="opcompte.operationBudgetaireID" [style]="{ width: '100%', height: '40px' }" 
+                                                    placeholder="{{ 'selCompte' | translate }}" [showClear]="true" [options]="comptebudgetaire" optionLabel="libelleFr" 
+                                                    optionValue="tacheID" [filter]="true" filterBy="libelleFr" [showClear]="true" (onChange)="getLibelleCompte(opcompte.operationBudgetaireID)">
+                                                    <ng-template let-act pTemplate="item">
+                                                        <div class="activite-item">
+                                                            <span style="font-weight: bold;">{{ act.compteCode.substring(2, 10) }}</span> - 
+                                                            <span *ngIf="verifyLengthOP(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescriptionOP(act.libelleFr) }}... </span>
+                                                            <span *ngIf="!verifyLengthOP(act.libelleFr)"> {{ act.libelleFr }} </span> - 
+                                                            <span style="color:brown">({{ act.cp ? act.cp.toLocaleString() : 0 }})</span>
+                                                        </div>
+                                                    </ng-template>
+                                                </p-dropdown>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="">{{'Montant' |translate}}</label>
+                                                <input type="number" [(ngModel)]="opcompte.montant" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col mt-1">
+                                            <button (click)="addOperationComp()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Ajouter' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-primary"> </button>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center">
+                                        <div class="alert alert-warning" role="alert" *ngIf="!comptes.length">
+                                            <h4 class="alert-heading"><i class="fas fa-meh"></i>&nbsp;&nbsp;{{ 'notingCompte' |translate }}</h4>
+                                            <p>{{ 'piapaCompte' |translate }}</p>
+                                        </div>
+                                        <div *ngIf="comptes.length">
+                                            <div class="card">
+                                                <p-table #dt [value]="comptes" [rows]="10" styleClass="p-datatable-sm" [rowHover]="true" dataKey="structureID">
+                                                    <ng-template pTemplate="header">
+                                                        <tr>
+                                                            <th style="width: 3rem; text-align: center">N°</th>
+                                                            <th>{{'intitule'|translate}}</th>
+                                                            <th>{{'Montant'|translate}}</th>
+                                                            <th><i class="fas fa-cog"></i></th>
+                                                        </tr>
+                                                    </ng-template>
+                                                    <ng-template pTemplate="body" let-item let-i="rowIndex">
+                                                        <tr>
+                                                            <td (click)="getOC(item)">{{i+1}}</td>
+                                                            <td (click)="getOC(item)">{{ item.libelleFr }}</td>
+                                                            <td class="fw-bold text-right" (click)="getOC(item)">{{ item.montant.toLocaleString() }}</td>
+                                                            <td><i (click)="remove(i, comptes)" class="fas fa-trash er" aria-hidden="true" pTooltip="{{ 'Supprimer' | translate }}" style="font-size: 20px; color: rgb(234, 66, 28);" tooltipPosition="top"></i></td>
+                                                        </tr>
+                                                    </ng-template>
+                                                </p-table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid texte" *ngIf="detailActivitePage">
+                    <p-accordion [(activeIndex)]="activeIndex" class="w-full">
+                        <p-accordionTab>
+                            <ng-template pTemplate="header">
+                                <div class="flex align-items-center">
+                                    <i class="fas fa-user-cog mr-2"></i>
+                                    <span class="vertical-align-middle titreCard">{{ 'Responsables' | translate }}</span>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <div class="row">
+                                    <p-tabView styleClass="tabview-custom">
+                                        <p-tabPanel>
+                                            <ng-template pTemplate="header">
+                                                <span>
+                                                    <label>{{ "Responsable" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                </span>
+                                            </ng-template>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label>{{ "Type" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-dropdown [(ngModel)]="activiteAR.typer" [style]="{ width: '100%', height: '40px' }" [showClear]="true" optionValue="id"
+                                                            [options]="types" optionLabel="label" placeholder="{{'vsutype' |translate}}"> </p-dropdown>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group" *ngIf="activiteAR.typer==1">
+                                                        <label>{{ "Agent" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-multiSelect [options]="agents" [(ngModel)]="selectedAR" [style]="{width:'100%'}"
+                                                            defaultLabel="{{ 'selAgent' |translate }}"
+                                                            optionLabel="nom" optionValue="matricule" display="chip">
+                                                        </p-multiSelect>
+                                                    </div>
+                                                    <div class="form-group" *ngIf="activiteAR.typer==2">
+                                                        <label>{{ "Structure" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-multiSelect [options]="structures" [(ngModel)]="selectedStrR" [style]="{width:'100%'}"
+                                                            defaultLabel="{{ 'selStructure' |translate }}"
+                                                            optionLabel="libelleFr" optionValue="structureID" display="chip">
+                                                        </p-multiSelect>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p-tabPanel>
+                                        <p-tabPanel>
+                                            <ng-template pTemplate="header">
+                                                <span>
+                                                    <label>{{ "Approbateur" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                </span>
+                                            </ng-template>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label>{{ "Type" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-dropdown [(ngModel)]="activiteAR.typea" [style]="{ width: '100%', height: '40px' }" [showClear]="true" optionValue="id"
+                                                            [options]="types" optionLabel="label" placeholder="{{'vsutype' |translate}}"> </p-dropdown>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group" *ngIf="activiteAR.typea==1">
+                                                        <label>{{ "Agent" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-multiSelect [options]="agents" [(ngModel)]="selectedAA" [style]="{width:'100%'}"
+                                                            defaultLabel="{{ 'selAgent' |translate }}"
+                                                            optionLabel="nom" optionValue="matricule" display="chip">
+                                                        </p-multiSelect>
+                                                    </div>
+                                                    <div class="form-group" *ngIf="activiteAR.typea==2">
+                                                        <label>{{ "Structure" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-multiSelect [options]="structures" [(ngModel)]="selectedStrA" [style]="{width:'100%'}"
+                                                            defaultLabel="{{ 'selStructure' |translate }}"
+                                                            optionLabel="libelleFr" optionValue="structureID" display="chip">
+                                                        </p-multiSelect>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p-tabPanel>
+                                        <p-tabPanel>
+                                            <ng-template pTemplate="header">
+                                                <span>
+                                                    <label>{{ "Consulté" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                </span>
+                                            </ng-template>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label>{{ "Type" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-dropdown [(ngModel)]="activiteAR.typec" [style]="{ width: '100%', height: '40px' }" [showClear]="true" optionValue="id"
+                                                            [options]="types" optionLabel="label" placeholder="{{'vsutype' |translate}}"> </p-dropdown>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group" *ngIf="activiteAR.typec==1">
+                                                        <label>{{ "Agent" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-multiSelect [options]="agents" [(ngModel)]="selectedAC" [style]="{width:'100%'}"
+                                                            defaultLabel="{{ 'selAgent' |translate }}"
+                                                            optionLabel="nom" optionValue="matricule" display="chip">
+                                                        </p-multiSelect>
+                                                    </div>
+                                                    <div class="form-group" *ngIf="activiteAR.typec==2">
+                                                        <label>{{ "Structure" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-multiSelect [options]="structures" [(ngModel)]="selectedStrC" [style]="{width:'100%'}"
+                                                            defaultLabel="{{ 'selStructure' |translate }}"
+                                                            optionLabel="libelleFr" optionValue="structureID" display="chip">
+                                                        </p-multiSelect>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p-tabPanel>
+                                        <p-tabPanel>
+                                            <ng-template pTemplate="header">
+                                                <span>
+                                                    <label>{{ "Informé" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                </span>
+                                            </ng-template>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label>{{ "Type" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-dropdown [(ngModel)]="activiteAR.typei" [style]="{ width: '100%', height: '40px' }" [showClear]="true" optionValue="id"
+                                                            [options]="types" optionLabel="label" placeholder="{{'vsutype' |translate}}"> </p-dropdown>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group" *ngIf="activiteAR.typei==1">
+                                                        <label>{{ "Agent" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-multiSelect [options]="agents" [(ngModel)]="selectedAI" [style]="{width:'100%'}"
+                                                            defaultLabel="{{ 'selAgent' |translate }}"
+                                                            optionLabel="nom" optionValue="matricule" display="chip">
+                                                        </p-multiSelect>
+                                                    </div>
+                                                    <div class="form-group" *ngIf="activiteAR.typei==2">
+                                                        <label>{{ "Structure" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                                                        <p-multiSelect [options]="structures" [(ngModel)]="selectedStrI" [style]="{width:'100%'}"
+                                                            defaultLabel="{{ 'selStructure' |translate }}"
+                                                            optionLabel="libelleFr" optionValue="structureID" display="chip">
+                                                        </p-multiSelect>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p-tabPanel>
+                                    </p-tabView>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+                        <p-accordionTab>
+                            <ng-template pTemplate="header">
+                                <div class="flex align-items-center">
+                                    <i class="fas fa-window-restore mr-2"></i>
+                                    <span class="vertical-align-middle titreCard">{{ 'Operations' | translate }}</span>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <div class="alert alert-warning" role="alert" *ngIf="!operations.length">
+                                    <h4 class="alert-heading"><i class="fas fa-meh"></i>&nbsp;&nbsp;{{ 'notingOp' |translate }}</h4>
+                                    <p>{{ 'piapaOp' |translate }}</p>
+                                    <hr>
+                                    <button (click)="createOP()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Nouvelle' | translate }}&nbsp;{{ 'operation'| translate }}" icon="fas fa-plus" iconPos="left" class="p-button-primary"></button>
+                                </div>
+                                <div class="card" *ngIf="operations.length">
+                                    <p-table #dt [value]="operations" styleClass="p-datatable-sm" >
+                                        <ng-template pTemplate="header">
+                                            <tr>
+                                                <th style="width: 3rem; text-align: center">N°</th>
+                                                <th>{{'LibelleFr'|translate}}</th>
+                                                <th>{{'Coût'|translate}}</th>
+                                                <th style="width: 3rem; text-align: center">
+                                                    <button (click)="createOP()" [style]="{ height: '30px' }" pButton pRipple type="button" label="{{ 'nouveau' | translate }}" icon="fas fa-plus-circle" iconPos="left" class="p-button-text p-button-primary"></button>
+                                                </th>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="body" let-item let-i="rowIndex">
+                                            <tr class="align-items-center">
+                                                <td (click)="getOP(item, 'edit')">{{i+1}}</td>
+                                                <td (click)="getOP(item, 'edit')">{{ item.libelleFr }}</td>
+                                                <td class="fw-bold text-right" (click)="getOP(item, 'edit')">{{ item.montant.toLocaleString() }}</td>
+                                                <td style="text-align: center">
+                                                    <i (click)="deleteOp(item)" pTooltip="{{'Supprimer'|translate}}" tooltipPosition="top" class="fas fa-trash er" style="font-size: 20px; color: rgb(234, 66, 28);"></i>&nbsp;&nbsp;
+                                                </td>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="footer">
+                                            <tr>
+                                                <td colspan="3">{{'total'|translate}}</td>
+                                                <td>{{ getTotalOperation() ? getTotalOperation().toLocaleString() : 0 }}</td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+                        <p-accordionTab>
+                            <ng-template pTemplate="header">
+                                <div class="flex align-items-center">
+                                    <i class="fas fa-wallet mr-2"></i>
+                                    <span class="vertical-align-middle titreCard">{{ 'memoireDepense' | translate }}</span>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <div class="row align-items-center">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="">{{'uos' |translate}}</label>
+                                            <p-dropdown [disabled]="action=='view'" [(ngModel)]="depense.moUniteOeuvreID" [style]="{ width: '100%', height: '40px' }" 
+                                                placeholder="{{ 'selUos' | translate }}" [showClear]="true" [options]="uos" optionLabel="designation" 
+                                                optionValue="moUniteOeuvreID" [filter]="true" filterBy="designation, conditionnement" [showClear]="true" (onChange)="getMontantUnite(depense.moUniteOeuvreID)">
+                                                <ng-template let-act pTemplate="item">
+                                                    <div class="activite-item">
+                                                        <span style="font-weight: bold;">{{ act.conditionnement }}</span> - 
+                                                        <span *ngIf="verifyLengthOP(act.designation)" pTooltip="{{ act.designation }}" tooltipPosition="top"> {{ defineDescriptionOP(act.designation) }}... </span>
+                                                        <span *ngIf="!verifyLengthOP(act.designation)"> {{ act.designation }} </span> - 
+                                                        <span style="color:brown; font-weight: 600;">({{ act.prixunitaire ? act.prixunitaire.toLocaleString() : 'N/A' }})</span>
+                                                    </div>
+                                                </ng-template>
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 mt-1">
+                                        <button (click)="createUo()" [style]="{ height: '35px' }" pButton pRipple type="button" pTooltip="{{ 'Nouveau' | translate }}" tooltipPosition="top" icon="fas fa-plus-circle" iconPos="left" class="p-button-primary"> </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="">{{'Quantité' |translate}}</label>
+                                            <input type="number" [(ngModel)]="depense.quantite" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button [disabled]="!depense.moUniteOeuvreID || !depense.quantite" (click)="addDepense()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Ajouter' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-primary"> </button>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning" role="alert" *ngIf="!depenses.length">
+                                    <h4 class="alert-heading"><i class="fas fa-meh"></i>&nbsp;&nbsp;{{ 'notingDepe' |translate }}</h4>
+                                    <p>{{ 'piapaDep' |translate }}</p>
+                                </div>
+                                <div class="card" *ngIf="depenses.length">
+                                    <p-table #dt [value]="depenses" styleClass="p-datatable-sm">
+                                        <ng-template pTemplate="header">
+                                            <tr>
+                                                <th style="width: 3rem; text-align: center">N°</th>
+                                                <th>{{'designation'|translate}}</th>
+                                                <th>{{'conditionnement'|translate}}</th>
+                                                <th>{{'P.U'|translate}}</th>
+                                                <th>{{'Qté'|translate}}</th>
+                                                <th>{{'Montant'|translate}}</th>
+                                                <th style="width: 3rem; text-align: center">
+                                                    <button (click)="printMemoire(modeA)" [style]="{ height: '30px' }" pButton pRipple type="button" label="{{ 'Imprimer' | translate }}" icon="fas fa-print" iconPos="left" class="p-button-text p-button-primary"></button>
+                                                </th>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="body" let-item let-i="rowIndex" let-rowgroup="rowgroup"
+                                            let-rowspan="rowspan">
+                                            <tr style="font-size: 13px;">
+                                                <td (click)="getMemoire(item)">{{i+1}}</td>
+                                                <td (click)="getMemoire(item)">{{ getUOeuvre(item.moUniteOeuvreID).designation }}</td>
+                                                <td (click)="getMemoire(item)">{{ getUOeuvre(item.moUniteOeuvreID).conditionnement }}</td>
+                                                <td (click)="getMemoire(item)">{{ getUOeuvre(item.moUniteOeuvreID).prixunitaire.toLocaleString() }}</td>
+                                                <td (click)="getMemoire(item)">{{ item.quantite }}</td>
+                                                <td class="fw-bold text-right" (click)="getMemoire(item)">{{ item.montant.toLocaleString() }}</td>
+                                                <td style="width: 3rem; text-align: right">
+                                                    <i (click)="remove(item, depenses)" pTooltip="{{'Supprimer'|translate}}" tooltipPosition="top" class="fas fa-trash er" style="font-size: 20px; color: rgb(234, 66, 28);"></i>&nbsp;&nbsp;
+                                                </td>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="footer">
+                                            <tr>
+                                                <td colspan="6">{{'total'|translate}}</td>
+                                                <td>{{ getTotalMemoire() ? getTotalMemoire().toLocaleString() : 0 }}</td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+                        <p-accordionTab>
+                            <ng-template pTemplate="header">
+                                <div class="flex align-items-center">
+                                    <i class="fas fa-archive mr-2"></i>
+                                    <span class="vertical-align-middle titreCard">{{ 'Objectif(s)' | translate }}</span>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <div class="alert alert-warning" role="alert" *ngIf="!objectifs.length">
+                                    <h4 class="alert-heading"><i class="fas fa-meh"></i>&nbsp;&nbsp;{{ 'notingObj' |translate }}</h4>
+                                    <p>{{ 'piapaObj' |translate }}</p>
+                                    <hr>
+                                    <button (click)="createObjectif()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Nouvel' | translate }}&nbsp;{{ 'Objectif'| translate }}" icon="fas fa-plus" iconPos="left" class="p-button-primary"></button>
+                                </div>
+                                <div class="card" *ngIf="objectifs.length">
+                                    <p-table #dt [value]="objectifs" styleClass="p-datatable-sm">
+                                        <ng-template pTemplate="header">
+                                            <tr>
+                                                <th style="width: 3rem; text-align: center">N°</th>
+                                                <th>{{'Code'|translate }}</th>
+                                                <th>{{'Designation'|translate }}</th>
+                                                <th style="width: 3rem; text-align: center">
+                                                    <button (click)="createObjectif()" [style]="{ height: '30px' }" pButton pRipple type="button" label="{{ 'nouveau' | translate }}" icon="fas fa-plus-circle" iconPos="left" class="p-button-text p-button-primary"></button>
+                                                </th>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="body" let-item let-i="rowIndex">
+                                            <tr class="align-items-center">
+                                                <td (click)="getObjectif(item, 'edit')">{{i+1}}</td>
+                                                <td (click)="getObjectif(item, 'edit')">{{ item.code }}</td>
+                                                <td (click)="getObjectif(item, 'edit')">{{ item.libelleFr }}</td>
+                                                <td style="text-align: center">
+                                                    <i (click)="remove(item, objectifs)" pTooltip="{{'Supprimer'|translate}}" tooltipPosition="top" class="fas fa-trash er" style="font-size: 20px; color: rgb(234, 66, 28);"></i>&nbsp;&nbsp;
+                                                </td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+                    </p-accordion>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [(visible)]="indicateurDialog" [modal]="true" [style]="{width: '850px'}" [draggable]="true" [resizable]="false">
+    <ng-template pTemplate="header">
+        <span style="font-size: 22px;">{{ actionInd+'Ind' | translate }}</span>
+    </ng-template>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="">{{'Code' |translate}}</label>
+                    <input [readonly]="true" type="text" [(ngModel)]="indicateur.code" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="">{{'Designation' |translate}}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+                    <textarea [readonly]="actionInd=='view'" type="text" [(ngModel)]="indicateur.libelleFr" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="">{{'Description' |translate}}</label>
+                    <textarea [readonly]="actionInd=='view'" type="text" [(ngModel)]="indicateur.description" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-sm-12 col-md-12 col-lg-3 col-xl-3">{{ "PeriodeRappel" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+            <div class="col-sm-10 col-md-2 col-lg-2 col-xl-2">
+                <input type="number" id="libelle" [readonly]="actionInd=='view'" [(ngModel)]="indicateur.periodicite"
+                    class="form-control">
+            </div>
+            <div class="col-sm-10 col-md-7 col-lg-7 col-xl-7">
+                <p-dropdown [disabled]="action=='view'" [readonly]="action=='view'"
+                    [(ngModel)]="indicateur.periodiciteType" [style]="{ width: '100%', height: '40px' }"
+                    placeholder=" " [showClear]="true" [options]="periodesType" optionLabel="libelle"
+                    optionValue="id">
+                </p-dropdown>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">{{'ref' |translate}}</label>
+                    <input [readonly]="actionInd=='view'" type="number" [(ngModel)]="indicateur.reference" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">{{'Cible' |translate}}</label>
+                    <input [readonly]="actionInd=='view'" type="number" [(ngModel)]="indicateur.cible" class="form-control">
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="row justify-content-center">
+            <button (click)="indicateurDialog=false" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left" class="p-button-secondary"> </button>
+                    &nbsp;&nbsp;
+            <button *ngIf="actionInd!='view'" [disabled]="!indicateur.libelleFr" (click)="saveIndicateur()" style="float: right;" pButton pRipple type="button" [style]="{ height: '35px' }"
+                label="{{ 'saveIndicateur' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-success"></button>
+          
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="uoDialog" [modal]="true" [style]="{width: '850px'}" [draggable]="true" [resizable]="false">
+    <ng-template pTemplate="header">
+        <span style="font-size: 22px;">{{ 'newUO' | translate }}</span>
+    </ng-template>
+    <div class="row justify-content-center">
+        <div class="row">
+            <div class="form-group">
+                <label for="">{{'typeunite' |translate}}</label>
+                <p-dropdown [(ngModel)]="uo.typeunite" [style]="{ width: '100%', height: '40px' }" [showClear]="true" optionValue="id" [options]="modesUo" optionLabel="label"
+                    placeholder="{{'vsumtyuo' |translate}}">
+                </p-dropdown>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="form-group">
+                <label for="">{{'designation' |translate}}</label>
+                <textarea rows="2" [readonly]="action=='view'" type="text" [(ngModel)]="uo.designation" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="form-group">
+                <label for="">{{'conditionnement' |translate}}</label>
+                <input [readonly]="action=='view'" type="text" [(ngModel)]="uo.conditionnement" class="form-control">
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="form-group">
+                <label for="">{{'prixunitaire' |translate}}</label>
+                <input [readonly]="action=='view'" type="number" [(ngModel)]="uo.prixunitaire" class="form-control">
+            </div>
+        </div>
+        
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="row justify-content-center">
+            <button (click)="uoDialog=false" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left" class="p-button-secondary"> </button>
+                    &nbsp;&nbsp;
+            <button (click)="saveUo()" style="float: right;" pButton pRipple type="button" [style]="{ height: '35px' }"
+                label="{{ 'saveUo' | translate }}" icon="fas fa-save" iconPos="left" class="p-button-success"></button>
+          
+        </div>
+    </ng-template>
+</p-dialog>
+
+
+
+<p-dialog class="mon-dialogue" [(visible)]="printDialog" [modal]="true" [style]="{ width: '80vw', height: '80vw' }" [draggable]="true" [resizable]="true" [closable]="false">
+    <ng-template pTemplate="header">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+                <div style="height: 100px;">
+                    <div class="row d-flex justify-content-center align-items-center">
+                        <div class="col text-center">
+                            <div class="card recrutement">
+                                <img src="assets/icons/word1.png" style="height: 50px; width:70px;" />
+                                <span>{{'WORD' | translate}}</span>
+                            </div>
+                        </div>
+                        <div class="col text-center">
+                            <div class="card recrutement">
+                                <img src="assets/icons/excel.png" style="height: 50px; width:70px;" />
+                                <span>{{'EXCEL' | translate}}</span>
+                            </div>
+                        </div>
+                        <div class="col text-center">
+                            <div class="card recrutement">
+                                <img src="assets/icons/pdf.png" style="height: 50px; width:70px;" />
+                                <span>{{'PDF' | translate}}</span>
+                            </div>
+                        </div>
+                        <div class="col text-center">
+                            <div class="card recrutement">
+                                <img src="assets/icons/json.png" style="height: 50px; width:70px;" />
+                                <span>{{'JSON' | translate}}</span>
+                            </div>
+                        </div>
+                        <div class="col text-center">
+                            <div class="card recrutement">
+                                <img src="assets/icons/csv.png" style="height: 50px; width:70px;" />
+                                <span>{{'CSV' | translate}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    
+    <iframe *ngIf="pdfData" [src]="pdfData" width="100%" height="100%"></iframe>
+    <section  *ngIf="!pdfData">
+        <div *ngIf="!fileUploaded" id="fuploader2" class="file-uploader px-2 py-3" (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
+            <input type="file" #fileInput accept="application/pdf" (change)="onFileSelected($event)" style="display: none;" />
+            <div class="icon-container mb-2 mx-auto d-flex justify-content-center align-items-center">
+                <span class="fa-stack fa-lg">
+                    <span class="primary-icon fas fa-file-pdf fa-stack-2x"></span>
+                    <span class="downloading-icon fa-chevron-circle-down fas fa-stack-1x" [ngClass]="{'fa-circle-error': fileTypeError}"> </span>
+                </span>
+            </div>
+            <div class="file-uploader-body mb-2">
+                <p class="file-upload-instructions">
+                    <a>{{ 'chudoc' | translate }}</a>
+                    <span class="hide-non-touch">{{ 'draganddrop' | translate }}</span>
+                </p>
+                <p class="drop-cta" [attr.data-defaultText]="defaultText" [attr.data-file-type-error]="fileTypeError ? 'File type must be PDF' : ''"> {{ dropText }} </p>
+            </div>
+        </div>
+    
+        <div *ngIf="fileUploaded">
+            <!-- <p-button [style]="{ height: '35px' }" icon="fas fa-trash" (click)="removeFile()" label="{{ 'removeFile' | translate }}" styleClass="p-button-danger p-button-text"> </p-button> -->
+            <div class="progress mt-2" *ngIf="uploadProgress > 0">
+                <div class="progress-bar" role="progressbar" [style.width.%]="uploadProgress" [ngClass]="{'bg-success': uploadProgress === 100, 'bg-info': uploadProgress < 100}" 
+                     aria-valuemin="0" aria-valuemax="100"> {{ uploadProgress }}% </div>
+            </div>
+            <iframe class="mt-2" *ngIf="pdfUrl" [src]="pdfUrl" width="100%" height="600px" style="border: none;"></iframe>
+        </div>
+    </section>
+    
+    <ng-template pTemplate="footer">
+        <div class="row justify-content-center">
+            <button (click)="printDialog=false;" [style]="{ height: '35px' }" pButton pRipple type="button"
+                label="{{ 'Fermer' | translate }}" icon="fas fa-times-circle"
+                class="p-button-secondary"></button>&nbsp;
+            <button *ngIf="mode!='activite'" (click)="removeFile()" [style]="{ height: '35px' }" pButton pRipple type="button"
+                label="{{ 'removeFile' | translate }}"  icon="fas fa-trash" iconPos="left"
+                class="p-button-danger"></button>&nbsp;
+            <button *ngIf="mode!='activite'" (click)="savePlan()" [style]="{ height: '35px' }" pButton pRipple type="button"
+                label="{{ 'savePlan' | translate }}"  icon="fas fa-save" iconPos="left"
+                class="p-button-success"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!-- SPINNER DE CHARGEMENT DU TREETABLE -->
+<div class="progress-spinner" *ngIf="displaySpinner" style="z-index: 9999">
+    <div class="d-flex justify-content-center"> <p-progressSpinner styleClass="custom-spinner" strokeWidth="4"
+            animationDuration=".5s"></p-progressSpinner> </div>
+    <div class="d-flex justify-content-center affiche">
+        <h6 style="color: rgb(255, 255, 255); z-index: 999"> {{ libelleSpinner | translate }} </h6>
+    </div>
+</div>

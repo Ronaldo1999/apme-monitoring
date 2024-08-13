@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+
+<body class="corp" style="background-image: url(assets/backreporting.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;
+	max-width: 100%;
+	max-height: 100%;
+	height: 100vh;
+	padding: 7em 0">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <h2 class="heading-section">{{ 'labelLogin' | translate }}</h2>
+                <h2 class="heading-section">{{ 'connexion' | translate }}</h2>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="login-wrap p-0">
+                    <form class="signin-form" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm"
+                        novalidate>
+                        <div class="alert alert-danger" role="alert" *ngIf="f.submitted && isLoginFailed">
+                            <i class="fas fa-exclamation-triangle"></i>&nbsp;<strong>{{'echecKon' |
+                                translate}}</strong> {{ errorMessage | translate }}
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" [(ngModel)]="form.username" #username="ngModel"
+                                placeholder="{{ 'enterLogin' | translate }}" name="email" required>
+                            <div style="position: relative; margin-top: -10px; color:red" role="alert"
+                                *ngIf="username.errors && f.submitted">
+                                {{ 'Username is required' | translate }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input id="password-field" type="password" class="form-control" [(ngModel)]="form.password"
+                                required minlength="4" #password="ngModel" type="password"
+                                placeholder="{{ 'enterPassword' | translate }}" name="password" id="passwordInputC"
+                                required />
+                            <span pTooltip="{{ 'showPass' | translate }}" tooltipPosition="top" *ngIf="vuec==false"
+                                (click)="togglePasswordVisibilityCon()"
+                                class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                            <span pTooltip="{{ 'hidePass' | translate }}" tooltipPosition="top" *ngIf="vuec==true"
+                                (click)="togglePasswordVisibilityCon()"
+                                class="fa fa-fw fa-eye-slash field-icon toggle-password"></span>
+
+                            <div style="position: relative; margin-top: -10px; color:red" role="alert"
+                                *ngIf="password.errors && f.submitted">
+                                <div *ngIf="password.errors.required">{{ 'requierdPassword' | translate }}</div>
+                                <div *ngIf="password.errors.minlength">
+                                    {{ 'maxLenghtPass' | translate }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" [disabled]="!form.password || !form.username"
+                                class="form-control btn btn-primary submit px-3">{{ 'connectMe' | translate }}</button>
+                        </div>
+                    </form>
+                    <p class="w-100 text-center">&mdash;&nbsp;{{ 'choiseLanguage' | translate }}&nbsp;&mdash;</p>
+                    <div class="social d-flex text-center">
+                        <a [ngClass]="{'bg-balck': langue=='fr'}" (click)="changeLang('fr')"
+                            class="px-2 py-2 mr-md-1 rounded"><span class="ion-logo-facebook mr-2"></span>
+                            {{ 'francais' | translate }}</a>&nbsp;&nbsp;
+                        <a [ngClass]="{'bg-balck': langue=='en'}" (click)="changeLang('en')"
+                            class="px-2 py-2 ml-md-1 rounded"><span class="ion-logo-twitter mr-2"></span>
+                            {{ 'anglais' | translate }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+
+<!-- SPINNER DE CHARGEMENT DU TREETABLE -->
+<div class="progress-spinner" *ngIf="spinner" style="z-index: 9999">
+    <div class="d-flex justify-content-center"> <p-progressSpinner styleClass="custom-spinner" strokeWidth="4"
+            animationDuration=".5s"></p-progressSpinner> </div>
+    <div class="d-flex justify-content-center affiche">
+        <h6 style="color: rgb(255, 255, 255); z-index: 999"> {{ loadingMessage | translate }} </h6>
+    </div>
+</div>

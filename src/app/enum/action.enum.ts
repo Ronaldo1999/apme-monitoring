@@ -1,0 +1,10 @@
+export enum Action {
+    LIST = 'LIST',
+    CREATE = 'CREATE',
+    CREATEPA = 'CREATEPA',
+    UPLOADPA = 'UPLOADPA',
+    CREATEAR = 'CREATEAR',
+    CREATEOP = 'CREATEOP',
+    UPDATEPA = 'UPDATEPA',
+    CREATEOB = 'CREATEOB',
+}

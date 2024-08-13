@@ -1,0 +1,368 @@
+<p-menu #menuOptions [model]="options" [popup]="true">
+    <ng-template pTemplate="item" let-item>
+        <span [ngStyle]="{ 'color': item.color }" pTooltip="{{ item.pTooltip |translate }}" tooltipPosition="top">
+            <i [class]="item.icon" [ngStyle]="{ 'color': item.color }"></i> &nbsp;
+            <span>{{ item.label | translate }}</span>
+        </span>
+    </ng-template>
+</p-menu>
+<p-menu #menuOptionCan [model]="options" [popup]="true">
+    <ng-template pTemplate="item" let-item>
+        <span [ngStyle]="{ 'color': item.color }" pTooltip="{{ item.pTooltip |translate }}" tooltipPosition="top">
+            <i [class]="item.icon" [ngStyle]="{ 'color': item.color }"></i> &nbsp;
+            <span>{{ item.label | translate }}</span>
+        </span>
+    </ng-template>
+</p-menu>
+
+<div class="row justify-content-center" *ngIf="pageByAction=='LIST'">
+    <div class="card bg-light border-0 cardRo" *ngIf="!pfs.length">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-4">
+                <img src="assets/pointfocal.png" alt="" style="max-width: 100%; max-height: 100%;">
+            </div>
+            <div class="col-12 col-md-8">
+                <div class="container bouli">
+                    <div class="row justify-content-center">
+                        <div class="col-10">
+                            <h1>
+                                <i class="fas fa-tablet text-secondary"></i>&nbsp;
+                                <span style="text-align:justify">{{'pointFocauxTit'|translate}}</span>
+                            </h1>
+                            <p>
+                                <span style="text-align:justify">{{'pointFocauxDet'|translate}}</span>
+                            </p>
+                            <hr>
+                            <p class="text-warning"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;{{ 'pourFallaPf' |translate }}</p>
+                        </div>
+                        
+                    </div>
+                    
+                   
+                    <div class="row mt-1 justify-content-center align-items-center">
+                        <div class="col-10">
+                            <div class="row mt-1 justify-content-center align-items-center">
+                                <div class="col-12 col-md-5">
+                                    <div class="form-group">
+                                        <label>{{ "Millesime" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span></label>
+                                        <p-dropdown [(ngModel)]="exercice.millesime" [style]="{ width: '100%', height: '40px' }"
+                                            [showClear]="true" optionValue="millesime" [options]="exercices" optionLabel="libelleFr"
+                                            placeholder=" ">
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ "Organisations" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span></label>
+                                        <p-dropdown [disabled]="action=='view'" [(ngModel)]="organisation.organisationID" [style]="{ width: '100%', height: '40px' }" placeholder="{{ 'selOrg' |translate }}" [showClear]="true" [options]="organisations" optionLabel="libelleFr"
+                                            optionValue="organisationID" [filter]="true" filterBy="libelleFr" [showClear]="true" (onChange)="structureList(organisation.organisationID)">
+                                            <ng-template let-act pTemplate="item">
+                                                <div class="activite-item" (click)="structureList(act.organisationID)">
+                                                    <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                                                    <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                                                </div>
+                                            </ng-template>
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-1 mt-4">
+                                    <p-button [disabled]="!organisation.organisationID" [style]="{ height: '35px' }" icon="fas fa-redo-alt" (click)="load()" styleClass="p-button-secondary"> </p-button>
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12 col-md-6">
+                                    <button [disabled]="!organisation.organisationID" (click)="load()" type="button" class="btn btn-lg btn-outline-dark">
+                                        <i class="fas fa-redo-alt"></i>&nbsp; {{ 'Actualiser'| translate }}
+                                    </button>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <button [disabled]="!organisation.organisationID" (click)="create()" type="button" class="btn btn-lg btn-outline-primary">
+                                        <i class="fas fa-plus"></i>&nbsp; {{ 'nouveau' | translate }}&nbsp;{{ 'pf'| translate }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card bg-light mt-1" *ngIf="pfs.length">
+        <div class="row mb-2 align-items-center">
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label>{{ "Millesime" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span>
+                    </label>
+                    <p-dropdown [(ngModel)]="exercice.millesime" [style]="{ width: '100%', height: '40px' }"
+                        [showClear]="true" optionValue="millesime" [options]="exercices" optionLabel="libelleFr"
+                        placeholder=" ">
+                    </p-dropdown>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label>{{ "Organisations" | translate }}<span
+                            class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span>
+                    </label>
+                    <p-dropdown [disabled]="action=='view'" [(ngModel)]="organisation.organisationID"
+                        [style]="{ width: '100%', height: '40px' }" placeholder="{{ 'selOrg' |translate }}"
+                        [showClear]="true" [options]="organisations" optionLabel="libelleFr"
+                        optionValue="organisationID" [filter]="true" filterBy="libelleFr" [showClear]="true"
+                        (onChange)="structureList(organisation.organisationID)">
+                        <ng-template let-act pTemplate="item">
+                            <div class="activite-item">
+                                <span *ngIf="verifyLength(act.libelleFr)"
+                                    (click)="structureList(organisation.organisationID)" pTooltip="{{ act.libelleFr }}"
+                                    tooltipPosition="top">
+                                    {{ defineDescription(act.libelleFr) }}... </span>
+                                <span *ngIf="verifyLength(act.libelleFr) == false"> {{
+                                    act.libelleFr }} </span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 d-flex justify-content-end">
+                <button (click)="load()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Actualiser' | translate }}" icon="pi pi-refresh" iconPos="left" class="p-button-secondary"></button>&nbsp;&nbsp;
+                <button [disabled]="!organisation.organisationID" (click)="create()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Nouveau' | translate }}&nbsp;{{ 'pf'| translate }}" icon="pi pi-plus" iconPos="left" class="p-button-primary"></button>
+            </div>
+        </div>
+       <!--  <div class="alert alert-warning" role="alert" *ngIf="!pfs.length" style="margin: 2%;">
+            <h4 class="alert-heading"><i class="fas fa-meh"></i>&nbsp;&nbsp;{{ 'notingPF' |translate }}</h4>
+            <p>{{ 'piapaom' |translate }}</p>
+            <hr>
+            <p class="mb-0">{{ 'creunpf' |translate }}</p><br>
+            <button [disabled]="!organisation.organisationID" (click)="create()" [style]="{ height: '35px' }" pButton pRipple type="button" label="{{ 'Nouveau' | translate }}&nbsp;{{ 'pf'| translate }}" icon="pi pi-plus" iconPos="left" class="p-button-primary"></button>
+        </div> -->
+
+        <div>
+            <div class="border-none push-right" style="padding: 0.5%; margin-top: -0.3;">
+                <i class="fas fa-search"></i>&nbsp;&nbsp;
+                <input pInputText pInputText type="text" style="width: 90%" (input)=" dt.filterGlobal($any($event.target).value, 'contains') " placeholder="Rechercher de la liste..." />
+            </div>
+            <div class="card mb-1">
+                <p-table #dt [value]="pfs" styleClass="p-datatable-sm" [paginator]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [showCurrentPageReport]="true" [rows]="50" [rowsPerPageOptions]="[10,25,50,100,125]"
+                    [globalFilterFields]="['moPlanTravailID', 'libelleFr', 'libelleUs', 'organisationID', 'structureID', 'millesime', 'description', 'last_update', 'user_update', 'ip_update', 'created_at', 'created_by',]"
+                    [(selection)]="selectedPa" [rowHover]="true" dataKey="rhCandidatureID">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th colspan="1" style="width: 3%; text-align: center">N°</th>
+                            <th colspan="1">{{ 'designationFr'|translate }}</th>
+                            <th colspan="1">{{ 'userID'|translate }}</th>
+                            <th colspan="1">{{ 'Nb Structure'|translate }}</th>
+
+                            <th colspan="1" class="text-center"> <i class="fa fa-cog"></i> </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item let-i="rowIndex">
+                        <tr>
+                            <td (click)="getPF(item, 'edit')">{{i+1}}</td>
+                            <!-- <td><p-tableCheckbox [value]="item"></p-tableCheckbox></td> -->
+                            <td (click)="getPF(item, 'edit')">{{ item.designationFr }}</td>
+                            <td (click)="getPF(item, 'edit')">{{ item.nom }}</td>
+                            <td (click)="getPF(item, 'edit')">
+                                <p-tag severity="primary" [value]="item.nbstructure" [rounded]="true"></p-tag>
+                            </td>
+                            <td class="text-center">
+                                <i pTooltip="{{'Modifier'|translate}}" tooltipPosition="top" class="fas fa-pen-square er" (click)="getPF(item, 'edit')" style="font-size: 20px; color: rgb(1, 46, 91);"></i>&nbsp;&nbsp;
+                                <i (click)="getPF(item, 'view')" pTooltip="{{'downloadFileWord'|translate}}" tooltipPosition="top" class="fa fa-eye er" style="font-size: 20px; color: rgb(1, 46, 91);"></i>&nbsp;&nbsp;
+                                <i (click)="delete(item)" pTooltip="{{'Supprimer'|translate}}" tooltipPosition="top" class="fas fa-trash er" style="font-size: 20px; color: rgb(234, 66, 28);"></i>&nbsp;&nbsp;
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid texte" *ngIf="pageByAction=='CREATE'">
+    <div class="row justify-content-center">
+        <div class="card cont bg-light">
+            <div class="row mb-2 mt-1 align-items-center">
+                <div class="col-12 col-md-6">
+                    <i class="fas fa-circle-left" (click)="getList()" style="font-size: 25px;"
+                        pTooltip="{{ 'backTo' | translate }}" tooltipPosition="top"></i>&nbsp;&nbsp;
+                    <span class="text-primary font-weight-bold titAction"> {{actionPF | translate }} </span>
+                </div>
+                <div class="col d-flex justify-content-end" *ngIf="action!='view'">
+                    <button (click)="getList()" [style]="{ height: '35px' }" pButton pRipple type="button"
+                        label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left"
+                        class="p-button-secondary">
+                    </button>
+                    &nbsp;&nbsp;
+                    <button (click)="save()" style="float: right;" pButton pRipple type="button"
+                        [style]="{ height: '35px' }" label="{{ 'savePf' | translate }}" icon="fas fa-save"
+                        iconPos="left" class="p-button-success"></button>
+                </div>
+            </div>
+            <div class="custom-scrollbar p-1">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="card shadow-sm border-0 p-2">
+                                <div class="row">
+                                    <span class="titreCard"> {{'infoBase' |translate}} </span>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="form-group">
+                                        <label for="">{{'designationFr' |translate}}</label>
+                                        <input [readonly]="action=='view'" type="text" [(ngModel)]="pf.designationFr"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="form-group">
+                                        <label for="">{{'designationUs' |translate}}</label>
+                                        <input [readonly]="action=='view'" type="text" [(ngModel)]="pf.designationUs"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="form-group">
+                                        <label for="">{{'userID' |translate}}</label>
+                                        <p-dropdown [disabled]="action=='view'" [(ngModel)]="pf.userID"
+                                            [style]="{ width: '100%', height: '40px' }"
+                                            placeholder="{{ 'selUU' |translate }}" [showClear]="true" [options]="users"
+                                            optionLabel="nom" optionValue="login" [filter]="true" filterBy="nom, prenom"
+                                            [showClear]="true">
+                                            <ng-template let-act pTemplate="item">
+                                                <div class="activite-item">
+                                                    <span>{{ act.nom }}</span>
+                                                </div>
+                                            </ng-template>
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                                <div class="row mt-1 align-items-center">
+                                    <div class="form-group">
+                                        <label for="">{{'description' |translate}}</label>
+                                        <textarea [readonly]="action=='view'" name="" [(ngModel)]="pf.description"
+                                            class="form-control" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="card shadow-sm border-0 p-2">
+                                <div class="row">
+                                    <span class="titreCard"> {{'selectedStructure' |translate}} </span>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="col-md-12">
+                                        <textarea [readonly]="true" name="" [(ngModel)]="seStr" class="form-control"
+                                            rows="5"></textarea>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card shadow-sm border-0 p-2">
+                            <div class="row">
+                                <span class="titreCard"> {{'afectStructure' |translate}} </span>
+                            </div>
+                            <div class="card bg-light">
+                                <div class="border-none push-right" style="padding: 0.5%; margin-top: -0.3;">
+                                    <i class="fas fa-search"></i>&nbsp;&nbsp;
+                                    <input pInputText pInputText type="text" style="width: 96%"
+                                        (input)=" dt.filterGlobal($any($event.target).value, 'contains') "
+                                        placeholder="Rechercher..." />
+                                </div>
+                                <p-table #dt [value]="structures" [rows]="50" [rowsPerPageOptions]="[10,25,50,100,125]"
+                                    styleClass="p-datatable-sm" [paginator]="true"
+                                    currentPageReportTemplate="Affichage de {first} à {last}  sur {totalRecords} structures"
+                                    [showCurrentPageReport]="true" [scrollable]="true" scrollHeight="35vw"
+                                    responsiveLayout="scroll"
+                                    [globalFilterFields]="['code', 'abbreviationFr', 'libelleFr']"
+                                    [(selection)]="selectedStructure" (onRowSelect)="onRowSelect($event)"
+                                    (onRowUnselect)="onRowSelect($event)" [rowHover]="true" dataKey="structureID">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 3rem; text-align: center">N°</th>
+                                            <th style="width: 3rem;"><p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                                            </th>
+                                            <th>{{'code'|translate}}</th>
+                                            <th>{{'abbreviationFr'|translate}}</th>
+                                            <th>{{'libelleFr'|translate}}</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-item let-i="rowIndex" let-rowgroup="rowgroup"
+                                        let-rowspan="rowspan">
+                                        <tr>
+                                            <td>{{i+1}}</td>
+                                            <td><p-tableCheckbox [disabled]="action=='view'"
+                                                    [value]="item"></p-tableCheckbox></td>
+                                            <td>{{ item.code }}</td>
+                                            <td>{{ item.abbreviationFr }}</td>
+                                            <td>{{ item.libelleFr }}</td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [(visible)]="deleteDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="true" [resizable]="false">
+    <ng-template pTemplate="header">
+        <span style="font-size: 22px;">{{ 'Attention !' | translate }}</span>
+    </ng-template>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <img [src]="srca" style="height: 50px; width:50px;" class="img-responsive mon-icon" />&nbsp;
+                <h5 class="text-center">{{ "questionDelete" | translate }}</h5>
+            </div>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="row justify-content-center">
+            <button class="btn btn-secondary btn-sm mx-2" (click)="deleteDialog=false">
+                <i class="fa fa-times-circle" aria-hidden="true"></i>&nbsp;&nbsp;{{ "Annuler" | translate }} </button>
+            <button type="button" class="btn btn-danger btn-sm mx-2" (click)="supprimer()">
+                <span>
+                    <i class="fas fa-trash" aria-hidden="true"></i>&nbsp;&nbsp; {{ "Supprimer" | translate }}</span>
+            </button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="messageDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="true" [resizable]="false">
+    <ng-template pTemplate="header">
+        <span style="font-size: 22px;">{{ title | translate }}</span>
+        <!--  <span style="font-size: 14px; font-weight: 600; font-style: italic;">{{ libelleDel }}</span> -->
+    </ng-template>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <img [src]="srca" style="height: 50px; width:50px;" class="img-responsive mon-icon" />&nbsp;
+                <h5 class="text-center">{{ message | translate }}</h5>
+            </div>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="row justify-content-center">
+            <button (click)="messageDialog=false;" [style]="{ height: '35px' }" pButton pRipple type="button"
+                label="{{ 'Annuler' | translate }}" icon="fas fa-times-circle" iconPos="left"
+                class="p-button-secondary"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!-- SPINNER DE CHARGEMENT DU TREETABLE -->
+<div class="progress-spinner" *ngIf="displaySpinner" style="z-index: 9999">
+    <div class="d-flex justify-content-center"> <p-progressSpinner styleClass="custom-spinner" strokeWidth="4"
+            animationDuration=".5s"></p-progressSpinner> </div>
+    <div class="d-flex justify-content-center affiche">
+        <h6 style="color: rgb(255, 255, 255); z-index: 999"> {{ "Chargement" | translate }} </h6>
+    </div>
+</div>

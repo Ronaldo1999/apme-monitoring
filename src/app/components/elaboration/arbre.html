@@ -1,0 +1,166 @@
+<!-- <div *ngIf="sousprogrammes.length">
+                            <div class="border-none push-right" style="padding: 0.5%; margin-top: -0.3;">
+                                <div class="form-group d-flex align-items-center">
+                                    <i class="fas fa-search"></i>&nbsp;&nbsp;
+                                    <input class="form-control" [(ngModel)]="libelleRec" type="text" style="width: 100%" placeholder="Saisir et appuyer sur entrer pour rechercher..." />&nbsp;
+                                    <p-button [style]="{ height: '35px' }" icon="fas fa-times" (click)="clearResearch()" label="Effacer" styleClass="p-button-text p-button-secondary"> </p-button>&nbsp;
+                                    <p-button [style]="{ height: '35px' }" icon="fas fa-plus" (click)="createAR()" label="{{ 'nouveau' | translate }}" styleClass="p-button-primary"> </p-button>&nbsp;
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-1 text-left">
+                                    <span class="float-left">
+                                        <div class="spinner-container" *ngIf="loading"> <div class="spinner"></div> &nbsp;<span class="loading">{{ 'Chargement'|translate }}</span> </div>
+                                    </span>
+                                </div>
+                                <div class="col-3 text-right"> <span class="tete">Désignation</span> </div>
+                                <div class="col-3 text-center"><span class="tete">Objectif</span></div>
+                                <div class="col-2"><span class="tete">Indicateurs</span></div>
+                                <div class="col-2"><span class="tete float-right">Montant</span></div>
+                                <div class="col-1"><span class="tete">Actions</span></div>
+                            </div>
+
+                            
+                            <span *ngFor="let sp of sousprogrammes">
+                                <div class="row card recrutement" (mouseover)="changeColorActivite(sp)" (mouseleave)="mouseUpActivite(sp)"  [ngClass]="{'recrutementSel':actions.length && itMyChildAction(sp)}">
+                                    <div class="row" style="align-items: center;">
+                                        <span [style.color]="sp.color" [ngClass]="{'recrutTextSel':actions.length && itMyChildAction(sp)}">
+                                            <span>
+                                                <i class="fas fa-folder elemnt" pTooltip="{{ 'Déroulez pour voir les actions'|translate }}" tooltipPosition="top" (click)="getMongo(sp)" *ngIf="!itMyChildAction(sp)"> </i>
+                                                <i class="fas fa-folder-open elemnt selectedEl" (click)="clear(sp)" *ngIf="actions.length && itMyChildAction(sp)"> </i>
+                                            </span> &nbsp;
+                                            <span class="activiteAR">{{ 'SP'|translate }}</span><span class="code">&nbsp;:&nbsp;{{ sp.code }}</span>&nbsp;
+                                            <span class="activiteARLib" *ngIf="verifyLengthRec(sp.libelleFr)" pTooltip="{{ sp.libelleFr }}" tooltipPosition="top"> {{ defineDescriptionRec(sp.libelleFr) }}... </span>
+                                            <span class="activiteARLib" *ngIf="!verifyLengthRec(sp.libelleFr)"> {{ sp.libelleFr }} </span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div *ngIf="actions.length && itMyChildAction(sp)" style="margin-left: 10px; border-left: 2px solid #007ad9;" [ngClass]="{'desactive': loading}">
+                                    <span *ngFor="let action of actions">
+                                        <div  class="row card recrutement" (mouseover)="changeColorActivite(action)" (mouseleave)="mouseUpActivite(action)" [ngClass]="{'recrutementSel':activites.length && itMyChildActivite(action)}">
+                                            <div class="row" style="align-items: center;">
+                                                <span [style.color]="action.color" [ngClass]="{'recrutTextSel':activites.length && itMyChildActivite(action)}"> 
+                                                    <span>
+                                                        <i class="fas fa-folder elemnt" pTooltip="{{ 'Déroulez pour voir les activités'|translate }}" tooltipPosition="top" (click)="getMongo(action)" *ngIf="!itMyChildActivite(action)"> </i>
+                                                        <i class="fas fa-folder-open elemnt selectedEl" (click)="clear(action)" *ngIf="activites.length && itMyChildActivite(action)"> </i>
+                                                    </span> &nbsp;
+                                                    <span class="activiteAR">{{ 'Action'|translate }}</span><span class="code">&nbsp;:&nbsp;{{ action.code }}</span>&nbsp;
+                                                    <span class="activiteARLib" *ngIf="verifyLengthRec(action.libelleFr)" pTooltip="{{ action.libelleFr }}" tooltipPosition="top"> {{ defineDescriptionRec(action.libelleFr) }}... </span>
+                                                    <span class="activiteARLib" *ngIf="!verifyLengthRec(action.libelleFr)"> {{ action.libelleFr }} </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="activites.length && itMyChildActivite(action)" style="margin-left: 10px; border-left: 2px solid #007ad9;">
+                                            <span *ngFor="let activ of activites">
+                                                <div class="row card recrutement" (mouseover)="changeColorActivite(activ)" (mouseleave)="mouseUpActivite(activ)" [ngClass]="{'recrutementSel':taches.length && itMyChildTaches(activ)}">
+                                                    <div class="row" style="align-items: center;">
+                                                        <span [style.color]="activ.color" [ngClass]="{'recrutTextSel':taches.length && itMyChildTaches(activ)}">
+                                                            <span>
+                                                                <i class="fas fa-folder elemnt" pTooltip="{{ 'Déroulez pour voir les taches'|translate }}" tooltipPosition="top" (click)="getMongo(activ)" *ngIf="!itMyChildTaches(activ)"> </i>
+                                                                <i class="fas fa-folder-open elemnt selectedEl" (click)="clear(activ)" *ngIf="taches.length && itMyChildTaches(activ)">
+                                                                </i>
+                                                            </span> &nbsp;
+                                                            <span class="activiteAR">{{ 'Activité'|translate }}</span><span class="code">&nbsp;:&nbsp;{{ activ.code }}</span>&nbsp;
+                                                            <span class="activiteARLib" *ngIf="verifyLengthRec(activ.libelleFr)" pTooltip="{{ activ.libelleFr }}" tooltipPosition="top"> {{ defineDescriptionRec(activ.libelleFr) }}... </span>
+                                                            <span class="activiteARLib" *ngIf="!verifyLengthRec(activ.libelleFr)"> {{ activ.libelleFr }} </span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="taches.length && itMyChildTaches(activ)" style="margin-left: 10px; border-left: 2px solid #007ad9;">
+                                                    <span *ngFor="let task of taches">
+                                                        <div (mouseover)="changeColorActivite(task)" (mouseleave)="mouseUpActivite(task)"class="row card recrutement" [ngClass]="{'recrutementSel':activitesAR.length && itMyChildAR(task)}">
+                                                            <div class="row" style="align-items: center;">
+                                                                <div class="col-11">
+                                                                    <span [style.color]="task.color" [ngClass]="{'recrutTextSel':activitesAR.length && itMyChildAR(task)}">
+                                                                        <span>
+                                                                            <i class="fas fa-folder elemnt" pTooltip="{{ 'dpvar'|translate }}" tooltipPosition="top" (click)="listAR(task)" *ngIf="!itMyChildAR(task)"> </i>
+                                                                            <i class="fas fa-folder-open elemnt selectedEl" (click)="clear(task)" *ngIf="activitesAR.length && itMyChildAR(task)"> </i>
+                                                                        </span> &nbsp;
+                                                                        <span class="activiteAR">{{ 'Tâche'|translate }}</span><span class="code">&nbsp;:&nbsp;{{ task.code }}</span>&nbsp;
+                                                                        <span class="activiteARLib" *ngIf="verifyLengthRec(task.libelleFr)" pTooltip="{{ task.libelleFr }}" tooltipPosition="top"> {{ defineDescriptionRec(task.libelleFr) }}... </span>
+                                                                        <span class="activiteARLib" *ngIf="!verifyLengthRec(task.libelleFr)"> {{ task.libelleFr }} </span>
+                                                                    </span>
+                                                                </div>
+                                                                <div class="col-1 text-right">
+                                                                    <span class="float-right;">
+                                                                        <i (click)="convertAR(task)" class="fas fa-share elemntf" pTooltip="{{ 'convertAR' | translate }}" tooltipPosition="top"> </i>&nbsp;
+                                                                        <i (click)="createAR(task)" class="fas fa-plus elemntf" pTooltip="{{ 'newAR' | translate }}" tooltipPosition="top"> </i>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div *ngIf="activitesAR.length && itMyChildAR(task)" style="margin-left: 10px; border-left: 2px solid #007ad9;">
+                                                            <span *ngFor="let act of activitesAR">
+                                                                <div class="row card recrutement" style="align-items: center;" (mouseover)="changeColorActiviteAR(act)" (mouseleave)="mouseUpActiviteAR(act)">
+                                                                    <div class="row" style="align-items: center;">
+                                                                        <div class="col-2" (click)="getAR(act, 'edit')">
+                                                                            <span>
+                                                                                <i class="fas fa-copy elemnt"> </i>
+                                                                            </span>&nbsp;
+                                                                            <span class="activiteARAR">{{ 'activiteAR'|translate }}</span>
+                                                                        </div>
+                                                                        <div (click)="getAR(act, 'edit')" class="zer col-3"> <span>{{ act.libelleFr }}</span> </div>
+                                                                        <div (click)="getAR(act, 'edit')" class="zer col-2"> <span>{{ act.objectif }}</span> </div>
+                                                                        <div (click)="getAR(act, 'edit')" class="zer col-2"> <span>{{ act.indicateur }}</span></div>
+                                                                        <div (click)="getAR(act, 'edit')" class="zer col-2"> <span style="font-weight: 600;">{{ act.montant.toLocaleString() }}</span></div>
+                                                                        <div class="col-1"> <span style="float:right"> <i (click)="onDropdown(act); menuOptions.toggle($event)" class="fas fa-ellipsis-h elemnt" pTooltip="Actions" tooltipPosition="left"> </i> </span> </div>
+                                                                    </div>
+                                                                </div>
+                                                            </span>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </span>
+                                </div>
+                            </span>
+                        </div> -->
+
+
+
+
+                        mouseUpActivite(activi: Activite) {
+                            for (const activ of this.activitesAll) {
+                              if (activ.activiteID == activi.activiteID && activ.color == "#0066FF") {
+                                activ.color = "#767676"; activi.color = "#767676"; activi.visibilte = "hidden";
+                              } else { activi.color = "#767676"; activi.visibilte = "hidden"; }
+                            }
+                          }
+                          decoloreAncienActivite(activi: Activite) {
+                            for (const activ of this.activitesAll) {
+                              if (activ.activiteID != activi.activiteID && activ.color == "#0066FF") {
+                                activ.color = "#767676"; activ.visibilte = "hidden"; activi.color = "#0066FF"; activi.visibilte = "visible";
+                              } else { activi.color = "#0066FF"; activi.visibilte = "visible"; }
+                            }
+                          }
+                          changeColorActivite(activ: Activite) {
+                            this.activite = activ;
+                            for (const activ of this.activitesAll) {
+                              if (activ.activiteID == activ.activiteID) {
+                                this.decoloreAncienActivite(activ);
+                              }
+                            }
+                          }
+                          mouseUpActiviteAR(activi: ActiviteARealiser) {
+                            for (const activ of this.activitesAR) {
+                              if (activ.moniActiviteARealiserID == activi.moniActiviteARealiserID && activ.color == "#0066FF") {
+                                activ.color = "#767676"; activi.color = "#767676"; activi.visibilte = "hidden";
+                              } else { activi.color = "#767676"; activi.visibilte = "hidden"; }
+                            }
+                          }
+                          decoloreAncienActiviteAR(activi: ActiviteARealiser) {
+                            for (const activ of this.activitesAR) {
+                              if (activ.moniActiviteARealiserID != activi.moniActiviteARealiserID && activ.color == "#0066FF") {
+                                activ.color = "#767676"; activ.visibilte = "hidden"; activi.color = "#0066FF"; activi.visibilte = "visible";
+                              } else { activi.color = "#0066FF"; activi.visibilte = "visible"; }
+                            }
+                          }
+                          changeColorActiviteAR(activ: ActiviteARealiser) {
+                            this.activiteAR = activ;
+                            for (const activ of this.activitesAR) {
+                              if (activ.moniActiviteARealiserID == activ.moniActiviteARealiserID) {
+                                this.decoloreAncienActiviteAR(activ);
+                              }
+                            }
+                          }

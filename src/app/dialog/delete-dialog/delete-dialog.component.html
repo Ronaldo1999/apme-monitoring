@@ -1,0 +1,75 @@
+<div class="container">
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <div class="row mb-5">
+                <div for="phase" class="col-sm-12 col-md-12 col-lg-2 col-xl-2">
+                    <span *ngIf="config.data.nature==3" class="text-warning" style="font-size: 36px;"><i class="fa fa-exclamation-circle" aria-hidden="true"></i></span>
+                    <span *ngIf="config.data.nature==2" class="text-danger" style="font-size: 36px;"><i class="fa fa-times-circle" aria-hidden="true"></i></span>
+                    <span *ngIf="config.data.nature==1" class="text-success" style="font-size: 36px;"><i class="fa fa-check-circle" aria-hidden="true"></i></span>
+                </div>
+                <div class="col-sm-10 col-md-9 col-lg-10 col-xl-10">
+                    <label for="" class="text-center" [style.color]="color">{{message}} </label>
+                </div>
+            </div>
+            <footer class="fixed-bottom">
+                <div class="d-flex justify-content-center m-3">
+                    <button class="btn btn-sm btn-secondary" (click)="closeKo()"> <i class="fas fa-times-circle"></i>&nbsp; <span>{{ 'Non' | translate }}</span> </button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-success" (click)="closeOk()"> <i class="fas fa-check-square"></i>&nbsp; <span>{{ 'Oui' | translate }}</span> </button>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div>
+<!-- <div class="modal-body">
+    <div class="row">
+        <div class="row mb-2">
+            <div for="phase" class="col-sm-12 col-md-12 col-lg-2 col-xl-2">
+                <span *ngIf="config.data.nature==3" class="text-warning"
+                    style="font-size: 36px;"><i class="fa fa-exclamation-circle" aria-hidden="true"></i></span>
+                <span *ngIf="config.data.nature==2" class="text-danger" style="font-size: 36px;"><i
+                        class="fa fa-times-circle" aria-hidden="true"></i></span>
+                <span *ngIf="config.data.nature==1" class="text-success" style="font-size: 36px;"><i
+                        class="fa fa-check-circle" aria-hidden="true"></i></span>
+            </div>
+            <div class="col-sm-10 col-md-9 col-lg-10 col-xl-10">
+                <label for="" class="text-center"
+                    [style.color]="color">{{message}}
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <p-button icon="fas fa-times" (click)="closeKo()" label="Non" styleClass="p-button-secondary">
+    </p-button>
+    <p-button icon="fas fa-check-square" (click)="closeOk()" label="Oui" styleClass="p-button-success">
+    </p-button>
+</div> -->
+<!-- <ng-template pTemplate="footer">
+    <p-button icon="pi pi-times" (click)="closeKo()" label="Non" styleClass="p-button-text p-button-secondary">
+    </p-button>
+    <p-button icon="pi pi-check-circle" (click)="closeOk()" label="Oui" styleClass="p-button-text p-button-success">
+    </p-button>
+</ng-template> -->
+
+<!-- <div class="container">
+    <div class="row mt-3">
+        <div class="col d-flex justify-content-center">
+            <h5 class="text-success">
+                
+            </h5>
+            
+            
+            <footer class="fixed-bottom bg-light">
+                <div class="d-flex justify-content-end m-4">
+                    <button class="btn btn-sm btn-primary" (click)="closeKo()">
+                        <span><i class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp; {{ 'Non' | translate }}</span>
+                    </button>
+                    <button class="btn btn-sm btn-primary" (click)="closeOk()">
+                        <span><i class="fa fa-check" aria-hidden="true"></i>&nbsp;&nbsp; {{ 'Oui' | translate }}</span>
+                    </button>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div> -->

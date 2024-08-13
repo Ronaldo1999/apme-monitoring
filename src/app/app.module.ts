@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, LOCALE_ID, NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
@@ -7,12 +7,11 @@ import { ConfigService } from './services/config.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { AccueilComponent } from './components/accueil/accueil.component';
-import { QuestionProtocoleComponent } from './components/question-protocole/question-protocole.component';
+
 import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
+import { DialogService } from 'primeng/dynamicdialog';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { EditorModule } from 'primeng/editor';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -21,24 +20,46 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { TreeTableModule } from 'primeng/treetable';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { CheckboxModule } from 'primeng/checkbox';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { SplitterModule } from 'primeng/splitter';
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
-import { MainComponent } from './main/main.component';
-import { LoginComponent } from './login/login.component';
-import { NotationComponent } from './components/notation/notation.component';
-import { ElementcrutialComponent } from './components/elementcrutial/elementcrutial.component';
-import { DomaineComponent } from './components/domaine/domaine.component';
 //import { NgxUploaderDirectiveModule } from 'ngx-uploader-directive';
 import { PrimeModule } from './shared/prime.module';
-import { JustificatifComponent } from './components/justificatif/justificatif.component';
-import { ReferenceoaciComponent } from './components/referenceoaci/referenceoaci.component';
-import { EvaluationComponent } from './components/evaluation/evaluation.component';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ConfirmationService } from 'primeng/api';
+import { AccueilComponent } from './accueil/accueil.component';
+import { LoginComponent } from './login/login.component';
+import { SplitterModule } from 'primeng/splitter';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { ElaborationComponent } from './components/elaboration/elaboration.component';
 
+import { ProfileComponent } from './components/profile/profile.component';
+import { WelcomeComponent } from './components/welcome/welcome.component';
+import { QRCodeModule } from 'angularx-qrcode';
+import { NgxPrintModule } from 'ngx-print';
+import { ResetpasswordComponent } from './components/resetpassword/resetpassword.component';
+import { NumberInputDirective } from './components/number-input-directive.directive';
+import { LogipageComponent } from './logipage/logipage.component';
+import { GroupesComponent } from './components/groupes/groupes.component';
+
+import { PickListModule } from 'primeng/picklist';
+import { PointfocalComponent } from './components/pointfocal/pointfocal.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { NumberMaxDirectiveDirective } from './components/number-max-imputation.directive';
+import { UsersComponent } from './components/users/users.component';
+import { HomeparametreComponent } from './components/homeparametre/homeparametre.component';
+import { UniteoeuvreComponent } from './components/uniteoeuvre/uniteoeuvre.component';
+import { ModecontractualisationComponent } from './components/modecontractualisation/modecontractualisation.component';
+
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import { DeleteDialogComponent } from './dialog/delete-dialog/delete-dialog.component';
+import { SuccessDialogComponent } from './dialog/success-dialog/success-dialog.component';
+import { ErrorDialogComponent } from './dialog/error-dialog/error-dialog.component';
+
+registerLocaleData(localeFr);
 
 export function initConfig(appConfig: ConfigService) {
   return () => appConfig.loadConfig();
@@ -49,38 +70,31 @@ export function HttpLoaderFactory(httpClient: HttpClient) {
 @NgModule({
   declarations: [
     AppComponent,
-    MainComponent,
-    AccueilComponent,
-    QuestionProtocoleComponent,
     LoginComponent,
-    NotationComponent,
-     ElementcrutialComponent,
-      DomaineComponent, 
-      JustificatifComponent,
-      ReferenceoaciComponent,
-      EvaluationComponent
-
+    AccueilComponent,
+    ElaborationComponent,
+    ProfileComponent,
+    WelcomeComponent,
+    ResetpasswordComponent,
+    NumberInputDirective,
+    NumberMaxDirectiveDirective,
+    LogipageComponent, GroupesComponent, PointfocalComponent,UsersComponent, HomeparametreComponent, UniteoeuvreComponent, ModecontractualisationComponent, DeleteDialogComponent, SuccessDialogComponent, ErrorDialogComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     AppRoutingModule,
-    //  NgxUploaderDirectiveModule,
     BrowserAnimationsModule,
     ReactiveFormsModule, HttpClientModule,
-
     PdfViewerModule,
-
-
-
     PrimeModule,
     DropdownModule,
     MultiSelectModule,
     TabMenuModule, SelectButtonModule, ProgressSpinnerModule,
     ConfirmPopupModule, ButtonModule, InputTextModule,
     TreeTableModule,
-    ConfirmDialogModule, DialogModule, EditorModule,
-
+    ConfirmDialogModule, DialogModule, EditorModule, OverlayPanelModule, SplitterModule, SplitButtonModule,
+    QRCodeModule, NgxPrintModule, PickListModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -88,16 +102,24 @@ export function HttpLoaderFactory(httpClient: HttpClient) {
         deps: [HttpClient]
       }
     }),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [
     DialogService,
     TranslateService,
+    ConfirmationService,
     {
       provide: APP_INITIALIZER,
       useFactory: initConfig,
       deps: [ConfigService],
       multi: true,
     },
+    { provide: LOCALE_ID, useValue: 'fr-FR' },
   ],
   bootstrap: [AppComponent]
 })

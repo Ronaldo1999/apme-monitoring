@@ -1,0 +1,42 @@
+export class Activiterapportlist {
+
+     last_update!:string;
+     user_update!:string;
+     ip_update!:string;
+     activiteID!:string;
+     libelleFr!:string;
+     libelleUs!:string;
+     millesime!:string;
+     niveauActiviteID!:string;
+     activiteParentID!:string;
+     code!:string;
+     organisationID!:string;
+     childs!:number;
+      activiteRapportID!:string;
+     periodeEvaluation!:string;
+     intitule!:string;
+     description!:string;
+     personnes!:string;
+     responsable!:string;
+     periode!:string;
+     pg!:string;
+     pgIndicateur!:string;
+     ac!:string;
+     acIndicateur!:string;
+     at!:string;
+     atObjectif!:string;
+     atIndicateur!:string;
+     activiteObjectif!:string;
+     activiteIndicateur!:string;
+     activiteResultatAttendu!:string;
+     resultatObtenu!:string;
+     indicateurObtenu!:string;
+     problemes!:string;
+     recommandations!:string;
+     moyens!:string;
+     totalPrev!:number;
+     totalRealisation!:number
+     ecart!:number;
+     offline!:boolean;
+
+}

@@ -1,0 +1,512 @@
+<div class="bg-light">
+  <h4 class="display-6 d-flex justify-content-center text-primary"> {{ 'Groupes' |
+    translate }} </h4>
+</div>
+<div class="row justify-content-center">
+  <div class="card cont bg-light">
+    <div class="row mb-2 mt-1 align-items-center">
+      <div class="col-12 col-md-2">
+        <div class="form-group">
+            <label>{{ "Millesime" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span>
+            </label>
+            <p-dropdown [(ngModel)]="exercice.millesime" [style]="{ width: '100%', height: '40px' }"
+                [showClear]="true" optionValue="millesime" [options]="exercices" optionLabel="libelleFr"
+                placeholder=" ">
+            </p-dropdown>
+        </div>
+    </div>
+      <div class="col-3">
+        <div class="form-group">
+          <label>{{ "Organisations" | translate }}<span class="text-danger champ-obligatoire">&nbsp;&nbsp;*</span> </label>
+          <p-dropdown [disabled]="action=='view'" [(ngModel)]="organisation.organisationID" [style]="{ width: '100%', height: '40px' }" placeholder="{{ 'selOrg' |translate }}" [showClear]="true" [options]="organisations" optionLabel="libelleFr"
+              optionValue="organisationID" [filter]="true" filterBy="libelleFr" [showClear]="true" (onChange)="listGroupess(organisation.organisationID)">
+              <ng-template let-act pTemplate="item">
+                  <div class="activite-item" (click)="listGroupess(act.organisationID)">
+                      <span *ngIf="verifyLength(act.libelleFr)" pTooltip="{{ act.libelleFr }}" tooltipPosition="top"> {{ defineDescription(act.libelleFr) }}... </span>
+                      <span *ngIf="verifyLength(act.libelleFr) == false"> {{ act.libelleFr }} </span>
+                  </div>
+              </ng-template>
+          </p-dropdown>
+        </div>
+      </div>
+      
+      <div class="col d-flex justify-content-end">
+        <!-- <button *ngIf="selectedAgents.length" [style]="{ height: '35px' }" pButton pRipple type="button"
+          label="{{ 'Editer un contrat' | translate }}" icon="fas fa-file-contract" iconPos="left"
+          class="p-button-secondary"></button>&nbsp;&nbsp; -->
+        <button *ngIf="exercice.millesime" (click)="refrech()" [style]="{ height: '35px' }" pButton pRipple
+          type="button" label="{{ 'Actualiser' | translate }}" icon="pi pi-refresh" iconPos="left"
+          class="p-button-secondery"></button>&nbsp;&nbsp;
+        <button *ngIf="exercice.millesime" (click)="showDialogEditGroup('new')" [style]="{ height: '35px' }" pButton
+          pRipple type="button" label="{{ 'Nouveau' | translate }}" icon="pi pi-plus" iconPos="left"
+          class="p-button-primary"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-light">
+    <div class="alert alert-warning" role="alert" *ngIf="!groupGlobalList.length" style="margin: 2%;">
+      <h4 class="alert-heading"><i class="fas fa-meh"></i>&nbsp;&nbsp;Aucun contrat !
+      </h4>
+      <p>Pour l'instant aucun contrat en contractualisation ne corresponds à cette organisation et ce
+        millesime.</p>
+      <hr>
+      <p class="mb-0">Creer un nouveau pour cette organisation et ce millesime.
+      </p>
+    </div>
+    <div *ngIf="groupGlobalList.length">
+      <div class="border-none push-right" style="padding: 0.5%; margin-top: -0.3;">
+        <i class="fas fa-search"></i>&nbsp;&nbsp;
+        <input pInputText pInputText type="text" style="width: 80%"
+          (input)=" dt.filterGlobal($any($event.target).value, 'contains') " placeholder="Rechercher..." />
+      </div>
+      <p-table #dt [value]="groupGlobalList" [rows]="10" styleClass="p-datatable-sm" [paginator]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true"
+        [globalFilterFields]="['nom', 'prenom', 'dateNaissance', 'lieuNaissance', 'email', 'objet' ]" [rowHover]="true"
+        dataKey="rhAgentContractuelID">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem; text-align: center"></th>
+            <th pSortableColumn="libelleFr" style="width: 80%"> {{ "Libelle" | translate }} <p-sortIcon
+                field="libelleFr"></p-sortIcon> </th>
+            <th style="width: 17%" class="text-center"> <i class="pi pi-cog"></i> </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-i="rowIndex">
+          <tr>
+            <td [ngClass]="{ actif: item.groupe.etat == 1 }" style="text-align: center">
+              <img src="assets/icons/grpe.png" style="height: 30px; width:30px;" class="img-responsive mon-icon" />
+            </td>
+            <td [ngClass]="{ actif: item.groupe.etat == 1 }">{{ item.groupe.libelleFr }}</td>
+            <td [ngClass]="{ actif: item.groupe.etat == 1 }" class="text-center">
+              <i *ngIf="habilitation('PFNL070302')" (click)="showDialogEditGroup('edit',item)"
+                class="pi pi-pencil text-success action-btn" pTooltip="Modifier"
+                tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+              <i *ngIf="habilitation('PFNL070303')" (click)="showDialogEditGroup('view',item)"
+                class="pi pi-eye text-secondary action-btn" pTooltip="Consultation"
+                tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+              <i *ngIf="habilitation('PFNL070305')" (click)="showDialogUser(item)" class="pi pi-user action-btn"
+                pTooltip="Utilisateurs" tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+              <i *ngIf="habilitation('PFNL070306')" (click)="showDialogRole(item)" class="pi pi-check-square action-btn"
+                pTooltip="Fonctionnalités" tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+              <i *ngIf="habilitation('PFNL070304')" (click)="showDialogConfirmGroupe(item)"
+                class="pi pi-trash text-danger action-btn" pTooltip="Supprimer" tooltipPosition="top"></i>
+              <span *ngIf="item.groupe.etat == 0"> &nbsp;&nbsp;&nbsp;&nbsp; <i
+                  class="pi pi-lock-open text-success action-btn" pTooltip="Activer" tooltipPosition="top"
+                  (click)="confirmActivationForOne(item.groupe, 1)"></i> </span>
+              <span *ngIf="item.groupe.etat == 1"> &nbsp;&nbsp;&nbsp;&nbsp; <i class="pi pi-lock text-danger action-btn"
+                  pTooltip="Desactiver" tooltipPosition="top" (click)="confirmActivationForOne(item.groupe, 0)"></i>
+              </span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  </div>
+</div>
+<!-- <div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left">
+      <img src="assets/icons/group.png" style="height: 60px; width:60px;" class="img-responsive mon-icon" />&nbsp;&nbsp;
+      <span class="titrePage">Groupes d'utilisateurs</span>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <button mat-raised-button class="btn-add" (click)="showDialogEditGroup('new')" *ngIf="habilitation('PFNL070301')">
+        <mat-icon>add</mat-icon>{{ "Ajouter" | translate }}</button>&nbsp;&nbsp;
+      <button mat-raised-button color="secondary" (click)="refrech()">
+        <mat-icon>refresh</mat-icon></button>&nbsp;&nbsp;
+    </ng-template>
+  </p-toolbar>
+  <div class="row mb-2">
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <div class="shadow border-none push-right"
+        style="padding: 0.5%; border: 0.5px solid rgb(166, 166, 166); background-color: rgb(234, 234, 234)">
+        <div>
+          <i class="pi pi-search"></i>&nbsp;&nbsp;
+          <input pInputText (input)=" dt.filterGlobal($any($event.target).value, 'contains') " type="text"
+            style="width: 90%" placeholder="Rechercher..." />
+          &nbsp;&nbsp;
+        </div>
+      </div>
+    </div>
+  </div>
+  <p-table #dt [value]="groupGlobalList" [rows]="10" styleClass="p-datatable-sm" [paginator]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true"
+      [globalFilterFields]="['groupe.libelleFr']"
+      [rowHover]="true" dataKey="groupe.goupeID">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem; text-align: center"></th>
+        <th pSortableColumn="libelleFr" style="width: 80%"> {{ "Libelle" | translate }} <p-sortIcon
+            field="libelleFr"></p-sortIcon> </th>
+        <th style="width: 17%" class="text-center"> <i class="pi pi-cog"></i> </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr>
+        <td [ngClass]="{ actif: item.groupe.etat == 1 }" style="text-align: center">
+          <img src="assets/icons/grpe.png" style="height: 30px; width:30px;" class="img-responsive mon-icon" />
+        </td>
+        <td [ngClass]="{ actif: item.groupe.etat == 1 }">{{ item.groupe.libelleFr }}</td>
+        <td [ngClass]="{ actif: item.groupe.etat == 1 }" class="text-center">
+          <i *ngIf="habilitation('PFNL070302')" (click)="showDialogEditGroup('edit',item)"
+            class="pi pi-pencil text-success action-btn" pTooltip="Modifier"
+            tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+          <i *ngIf="habilitation('PFNL070303')" (click)="showDialogEditGroup('view',item)"
+            class="pi pi-eye text-secondary action-btn" pTooltip="Consultation"
+            tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+          <i *ngIf="habilitation('PFNL070305')" (click)="showDialogUser(item)" class="pi pi-user action-btn"
+            pTooltip="Utilisateurs" tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+          <i *ngIf="habilitation('PFNL070306')" (click)="showDialogRole(item)" class="pi pi-check-square action-btn"
+            pTooltip="Fonctionnalités" tooltipPosition="top"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+          <i *ngIf="habilitation('PFNL070304')" (click)="showDialogConfirmGroupe(item)"
+            class="pi pi-trash text-danger action-btn" pTooltip="Supprimer" tooltipPosition="top"></i>
+          <span *ngIf="item.groupe.etat == 0"> &nbsp;&nbsp;&nbsp;&nbsp; <i
+              class="pi pi-lock-open text-success action-btn" pTooltip="Activer" tooltipPosition="top"
+              (click)="confirmActivationForOne(item.groupe, 1)"></i> </span>
+          <span *ngIf="item.groupe.etat == 1"> &nbsp;&nbsp;&nbsp;&nbsp; <i class="pi pi-lock text-danger action-btn"
+              pTooltip="Desactiver" tooltipPosition="top" (click)="confirmActivationForOne(item.groupe, 0)"></i> </span>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage" let-item>
+      <tr>
+        <td [attr.colspan]="4"> {{ "Aucun Enregistrement trouvé" | translate }} </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div> -->
+
+<!-- --------------------------------------------editer Groupe -->
+<p-dialog [modal]="true" [(visible)]="displayEditGroup" [style]="{ width: '40vw' }">
+  <ng-template pTemplate="header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col d-flex justify-content-start">
+          <h5> <img src="assets/icons/grpe.png" style="height: 25px; width:25px;"
+              class="img-responsive mon-icon" />&nbsp;{{ libelle | translate }} <span class="text-primary"></span></h5>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="content">
+    <fieldset
+      style=" background-color: rgb(233, 244, 245); border: 1px solid gainsboro; padding: 5px; border-radius: 8px; margin-top: 1%; border-bottom: 4px solid rgb(39, 174, 241);">
+      <legend style="margin-top: -2.3%; font-size: 16px; font-weight: bold;" class="text-center">
+        <img src="assets/icons/grpe.png" style="height: 100px; width:100px;" class="img-responsive mon-icon" />
+      </legend>
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12 col-lg-3 col-md-3 col-xl-3"> <label>Code</label> </div>
+          <div class="col-sm-12 col-lg-4 col-md-4 col-xl-4">
+            <input [readonly]="action=='view'" [(ngModel)]="groupeGlobal.groupe.code" type="text" name="code"
+              class="form-control" (ngModelChange)="duplicateCode = false" required />
+            <small class="p-invalid" style="color: red" *ngIf="groupeSubmitted && !groupeGlobal.groupe.code"> {{
+              "require code" | translate }}</small>
+            <small class="p-invalid" style="color: red" *ngIf="duplicateCode"> {{ "duplicate code" | translate
+              }}</small>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-sm-12 col-lg-3 col-md-3 col-xl-3"> <label>{{ "Libelle" | translate }} ( {{ "francais" |
+              translate }} ) </label> </div>
+          <div class="col-sm-12 col-lg-9 col-md-9 col-xl-9">
+            <input [(ngModel)]="groupeGlobal.groupe.libelleFr" [readonly]="action=='view'" type="text" name="libelleFr"
+              class="form-control" (ngModelChange)="duplicateLibelleFr = false" />
+            <small class="p-invalid" style="color: red" *ngIf="groupeSubmitted && !groupeGlobal.groupe.libelleFr"> {{
+              "require wording" | translate }}</small>
+            <small class="p-invalid" style="color: red" *ngIf="duplicateLibelleFr"> {{ "duplicate wording" | translate
+              }}</small>
+          </div>
+        </div>
+
+        <div class="row mt-2">
+          <div class="col-sm-12 col-lg-3 col-md-3 col-xl-3"> <label>{{ "Libelle" | translate }} ( {{ "anglais" |
+              translate }} ) </label> </div>
+          <div class="col-sm-12 col-lg-9 col-md-9 col-xl-9"> <input [(ngModel)]="groupeGlobal.groupe.libelleUs"
+              [readonly]="action=='view'" type="text" name="libelleUs" class="form-control" /> </div>
+        </div>
+      </div>
+    </fieldset>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-secondary btn-sm mx-2" (click)="closeDialogEditGroup()">
+        <i class="fas fa-times-circle"></i>&nbsp;&nbsp;{{ "Annuler" | translate }}
+      </button>
+      <button [disabled]="!groupeGlobal.groupe.code || !groupeGlobal.groupe.libelleFr" (click)="addGroupe()"
+        *ngIf="action=='new'" type="button" class="btn btn-success btn-sm mx-2">
+        <i class="fas fa-save"></i>&nbsp;&nbsp;{{ "Enregistrer" | translate }}
+      </button>
+      <button [disabled]="!groupeGlobal.groupe.code || !groupeGlobal.groupe.libelleFr"
+        (click)="saveGroupe(groupeGlobal.groupe)" *ngIf="action=='edit'" type="button"
+        class="btn btn-success btn-sm mx-2">
+        <i class="fas fa-save"></i>&nbsp;&nbsp;{{ "Enregistrer" | translate }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+<!--  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  -->
+
+<!-- --------------------------------------------Fonctionnalités du groupe -->
+<p-dialog [modal]="true" [(visible)]="displayRole" [style]="{ width: '60vw' }">
+  <ng-template pTemplate="header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col d-flex justify-content-center">
+          <h5><img src="assets/icons/icons8-tools.png" style="height: 30px; width:30px;"
+              class="img-responsive mon-icon" />&nbsp; {{ "Fonctionnalités du groupe" | translate }} <span
+              class="text-primary">{{ groupeGlobal.groupe.libelleFr }}</span> </h5>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="body">
+    <div class="card">
+      <p-treeTable [value]="files1" selectionMode="checkbox" [(selection)]="selectedNodes3" styleClass="p-treetable-sm">
+        <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-rowIndex>
+          <tr [ttRow]="rowNode">
+            <td>
+              <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+              <p-treeTableCheckbox [value]="rowNode"></p-treeTableCheckbox>
+              <span>
+                <img src="assets/icons/icons8-tools.png" style="height: 25px; width:25px;"
+                  class="img-responsive mon-icon" />&nbsp;
+                <span style="font-weight: 500;">({{ rowData.code }})</span> - {{ rowData.libelleFr }}
+              </span>
+            </td>
+            <!-- <td>{{ rowData.libelleFr }}</td> -->
+          </tr>
+        </ng-template>
+      </p-treeTable>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-secondary btn-sm mx-2" (click)="closeDialogRole()">
+        <i class="fas fa-times-circle"></i>&nbsp;&nbsp;{{ "Annuler" | translate }}
+      </button>
+      <button (click)="affecterRole(groupeGlobal)" type="button" class="btn btn-success btn-sm mx-2">
+        <i class="fas fa-save"></i>&nbsp;&nbsp;{{ "Enregistrer" | translate }}
+      </button>
+    </div>
+
+  </ng-template>
+</p-dialog>
+<!--  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  -->
+
+<!-- --------------------------------------------Utilisateurs du groupe -->
+<p-dialog [modal]="true" [(visible)]="displayUser">
+  <ng-template pTemplate="header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col d-flex justify-content-center">
+          <h5><img src="assets/icons/userp.png" style="height: 30px; width:30px;"
+              class="img-responsive mon-icon" />&nbsp; {{ "Utilisateurs du groupe" | translate }} <span
+              class="text-primary">{{ groupeGlobal.groupe.libelleFr }}</span> </h5>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="body">
+    <p-pickList [source]="users" [target]="groupeGlobal.users" [responsive]="true" filterBy="nom"
+      sourceHeader="Tous les Utilisateurs" targetHeader="Utilisateurs du groupe"
+      [style]="{ width: '80vw', height: '80%' }" sourceFilterPlaceholder="Rechercher par nom"
+      targetFilterPlaceholder="Rechercher par nom">
+      <ng-template let-us pTemplate="item">
+        <div>
+          <span>
+            <img src="assets/icons/userp.png" style="height: 25px; width:25px;" class="img-responsive mon-icon" />&nbsp;
+            {{ us.nom }} {{ us.prenom }}
+          </span>
+        </div>
+      </ng-template>
+    </p-pickList>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-secondary btn-sm mx-2" (click)="closeDialogUser()">
+        <i class="fas fa-times-circle"></i>&nbsp;&nbsp;{{ "Annuler" | translate }}
+      </button>
+      <button (click)="affecterUser()" type="button" class="btn btn-success btn-sm mx-2">
+        <i class="fas fa-save"></i>&nbsp;&nbsp;{{ "Enregistrer" | translate }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+<!--  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  -->
+
+<!-- dialog confirmer suppression Groupe -->
+<p-dialog header="{{ 'Attention' | translate }}" [modal]="true" [(visible)]="displayConfirmGroupe"
+  [style]="{ width: '400px' }">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="card-body">
+          <h6> <i class="fa fa-exclamation-triangle fa-fw me-3 text-warning"></i> {{ "Confirmer suppression groupe" |
+            translate }} </h6>
+          <div class="card-footer d-flex justify-content-end">
+            <button class="btn btn-sm btn-primary me-2" (click)="deleteGroupe()"> {{ "Oui" | translate }} </button>
+            <button class="btn btn-sm btn-secondary" (click)="closeConfirmGroupe()"> {{ "Annuler" | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+<!--  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  ----  -->
+
+<!-- dialog erreur -->
+<p-dialog header="{{ 'Erreur' | translate }}" [modal]="true" [(visible)]="displayError" [style]="{ width: '400px' }">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="card-body">
+          <h6 class="text-danger"> <i class="fa fa-times fa-fw me-3 text-danger"></i> {{ errorMessage | translate }}
+          </h6>h6
+          <div class="card-footer d-flex justify-content-end"> <button class="btn btn-sm btn-primary"
+              (click)="closeError()"> OK </button> </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- dialog succès -->
+<p-dialog header="{{ 'Succes' | translate }}" [modal]="true" [(visible)]="displaySucces" [style]="{ width: '400px' }">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="card-body">
+          <h6 class="text-success"> {{ succesMessage | translate }} </h6>
+          <div class="card-footer d-flex justify-content-end"> <button class="btn btn-sm btn-primary"
+              (click)="closeSucces()"> OK </button> </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- dialog confirmer suppression Groupe -->
+<!-- -------------------------------------------------------------------------------------- dconfirmActionDialog -------------------------------------------------------------------------------------- -->
+
+<!-- Dialog pour les Suppressions -->
+<p-dialog header="{{ 'Suppression' | translate }}" [(visible)]="displayConfirmGroupe" [closable]="false" [modal]="true"
+  [style]="{ width: '30vw' }" [draggable]="false" [closable]="false" [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <img src="assets/icons/atention.png" style="height: 50px; width:50px;" class="img-responsive mon-icon" />&nbsp;
+        <div class="alert alert-danger" role="alert">
+          <h4 class="text-center text-danger" style="font-size: 20px; font-weight: 700; color: red">{{ "questSupress" |
+            translate
+            }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center">
+      <button class="btn btn-secondary btn-sm mx-2" (click)="displayConfirmGroupe = false">
+        <i class="fas fa-times-circle"></i>&nbsp;&nbsp;{{ "Annuler" | translate }}
+      </button>
+      <button (click)="deleteGroupe()" type="button" class="btn btn-success btn-sm mx-2">
+        <i class="fas fa-trash"></i>&nbsp;&nbsp;{{ "Supprimer" | translate }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+
+<!-- -------------------------------------------------------------------------------------- dconfirmActionDialog -------------------------------------------------------------------------------------- -->
+
+<p-dialog [(visible)]="dconfirmActionDialog" header="Confirm" [modal]="true" [style]="{ width: '30vw' }"
+  [draggable]="false" [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <label *ngIf="actif == 1" for="" class="text-center" style="font-size: 20px; font-weight: 700">{{ "confirmActif"
+          | translate }} </label>
+        <label *ngIf="actif == 0" for="" class="text-center" style="font-size: 20px; font-weight: 700">{{
+          "confirmDesActif" | translate }} </label>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center">
+      <button class="btn btn-secondary btn-sm mx-2" (click)="displayConfirmGroupe = false">
+        <i class="fas fa-times-circle"></i>&nbsp;&nbsp;{{ "Annuler" | translate }}
+      </button>
+      <button (click)="updateState()" type="button" class="btn btn-success btn-sm mx-2">
+        <span *ngIf="actif == 0"><i class="pi pi-lock"></i>&nbsp;&nbsp;{{ "Desactiver" | translate }}</span>
+        <span *ngIf="actif == 1"><i class="pi pi-lock-open"></i>&nbsp;&nbsp;{{ "Activer" | translate }}</span>
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- -------------------------------------------------------------------------------------- Sussess -------------------------------------------------------------------------------------- -->
+<p-dialog [(visible)]="successDialog" header="Confirm" [modal]="true" [style]="{ width: '25vw' }" [draggable]="false"
+  [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <label for="" class="text-center text-success" style="font-size: 20px; font-weight: 700">{{ succesMessage |
+          translate }} </label>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center">
+      <button class="btn btn-sm btn-primary" (click)="successDialog = false"> OK </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- -------------------------------------------------------------------------------------- Error -------------------------------------------------------------------------------------- -->
+<p-dialog [(visible)]="errorDialog" header="Confirm" [modal]="true" [style]="{ width: '25vw' }" [draggable]="false"
+  [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center"> <label for="" class="text-center text-danger"
+          style="font-size: 20px; font-weight: 700">{{ errorMessage | translate }} </label> </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center">
+      <button class="btn btn-sm btn-primary" (click)="errorDialog = false"> OK </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ------------------------------------------------------------------------------------------ Dialog de Erreur de numéro ------------------------------------------------------------------------------------------ -->
+<p-dialog [(visible)]="dialogAction" header="Attention !" [modal]="true" [style]="{ width: '20vw' }" [draggable]="false"
+  [closable]="false" [resizable]="false">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <img src="assets/icons/atention.png" style="height: 70px; width:70px;" class="img-responsive mon-icon" />&nbsp;
+        <h4 class="text-center text-danger" style="font-size: 20px; font-weight: 700">{{ errorMessage }}</h4>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="row justify-content-center">
+      <button class="btn btn-sm btn-primary" (click)="dialogAction = false"> OK </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- -------------------------------------------------------------------------------------- displaySpinner -------------------------------------------------------------------------------------- -->
+<div class="progress-spinner" *ngIf="displaySpinner" style="z-index: 9999">
+  <div class="d-flex justify-content-center"> <p-progressSpinner styleClass="custom-spinner" strokeWidth="4"
+      animationDuration=".5s"></p-progressSpinner> </div>
+  <div class="d-flex justify-content-center affiche">
+    <h6 style="color: rgb(255, 255, 255); z-index: 999">{{ "intraite" | translate }}</h6>
+  </div>
+</div>

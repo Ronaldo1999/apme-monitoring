@@ -1,0 +1,531 @@
+.box {
+    background-color: rgba(0, 0, 0, 0.276);
+    padding: 0.5%;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.27);
+    border-radius: 10px;
+}
+
+.titre1 {
+    font-size: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+tr:hover {
+    cursor: pointer;
+}
+
+.titre2 {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.monimg {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+.questionImg {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.monimg2 {
+    font-size: 20px;
+    height: 25px;
+    width: 25px;
+}
+
+.monimg3 {
+    height: 35px;
+    width: 35px;
+}
+
+.dateRec {
+    font-weight: 600;
+    color: rgb(23, 74, 125);
+}
+
+.code {
+    font-weight: 600;
+    color: rgb(23, 74, 125);
+}
+
+.monimg:hover {
+    cursor: pointer;
+}
+
+.elemnt:hover {
+    cursor: pointer;
+}
+
+.elemnt {
+    font-size: 20px;
+}
+
+.entete {
+    text-transform: uppercase;
+}
+
+.monimg2:hover {
+    cursor: pointer;
+}
+
+.recrutement {
+    padding: 1%;
+    background-color: #fff;
+    //border-left: 3px solid rgb(23, 74, 125);
+    border-radius: 5px;
+    margin: 0.2%;
+}
+
+.recrutementSel {
+    padding: 1%;
+    background-color: #fff;
+    border-left: 5px solid #007ad9;
+    border-radius: 8px;
+    /* box-shadow: 0 0 5px rgba(0, 0, 0, 0.31); */
+}
+
+.recrutTextSel {
+    font-weight: 600;
+    color: #007ad9;
+}
+
+.structure {
+    padding: 1%;
+    background-color: #fff;
+    border-left: 3px solid rgb(23, 74, 125);
+    border-radius: 5px;
+    margin: 0.2%;
+}
+
+.structureSel {
+    padding: 1%;
+    background-color: #fff;
+    border-left: 10px solid #007ad9;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.31);
+}
+
+.structTextSel {
+    font-weight: 600;
+    color: #007ad9;
+}
+
+
+.structure:hover {
+    border-left: 10px solid #007ad9;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.31);
+}
+
+.mouna {
+    border-left: 3px solid rgb(23, 74, 125);
+    //margin-top: 1%;
+    margin-left: 1.2%;
+}
+
+.mouna2 {
+    margin-top: 0.3%;
+    margin-left: 0.5%;
+}
+
+.monHr {
+    margin-top: -0.2%;
+    height: 4px;
+    width: 30%;
+    background-color: rgb(23, 74, 125);
+    border-radius: 40px;
+    margin-left: 3%;
+}
+
+.monHr2 {
+    margin-top: -0.2%;
+    height: 4px;
+    width: 30%;
+    background-color: rgb(23, 74, 125);
+    border-radius: 40px;
+    margin-left: 3%;
+}
+
+
+.carde {
+    background-color: #fff;
+    border-radius: 8px;
+    min-height: 100px;
+    margin: 0;
+    padding: 1.2rem 1.2rem;
+    border: none;
+    color: rgb(250, 250, 250);
+    letter-spacing: 0.05rem;
+    font-family: "Arial", sans-serif;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.27);
+
+    .txt {
+        //margin-left: -3rem;
+        z-index: 1;
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        p {
+            //font-size: .7rem;
+            font-size: 14px;
+            font-family: "Open Sans", sans-serif;
+            letter-spacing: 0rem;
+            margin-top: 33px;
+            opacity: 1;
+            color: rgba(255, 255, 255, 1);
+        }
+    }
+
+    a {
+        z-index: 3;
+        font-size: 0.7rem;
+        color: rgba(0, 0, 0, 1);
+        margin-left: 1rem;
+        position: relative;
+        // bottom: -.5rem;
+        text-transform: uppercase;
+
+        &:after {
+            content: "";
+            display: inline-block;
+            height: 0.5em;
+            width: 0;
+            margin-right: -100%;
+            margin-left: 10px;
+            border-top: 1px solid rgb(161, 46, 46);
+            transition: 0.5s;
+        }
+    }
+
+    .ico-carde {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    i {
+        position: relative;
+        right: -50%;
+        top: 60%;
+        font-size: 12rem;
+        line-height: 0;
+        opacity: 0.2;
+        color: rgba(255, 255, 255, 1);
+        z-index: 0;
+    }
+}
+
+
+.h-100 {
+    height: 15vh !important;
+    background-color: transparent;
+}
+
+.align-middle {
+    position: relative;
+    top: 0%;
+    transform: translateY(-3%);
+}
+
+.ele:hover {
+    background-color: #d4d4d4;
+    // opacity: 0.3;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.column {
+    margin-top: 3rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    background-color: transparent;
+
+    &:hover {
+        padding-left: 0;
+        padding-right: 0;
+        cursor: pointer;
+
+        .carde .txt {
+            margin-left: 1rem;
+
+            p {
+                color: rgba(255, 255, 255, 1);
+                opacity: 1;
+            }
+        }
+
+        a {
+            color: rgba(255, 255, 255, 1);
+
+            &:after {
+                width: 5%;
+            }
+        }
+    }
+}
+
+.ele {
+    margin-top: 1%;
+    opacity: 0.9;
+}
+
+.element {
+    color: #212121;
+    font-size: 22px;
+}
+
+.valide {
+    background-color: #29d164d3;
+    padding: 5px;
+    font-style: italic;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 20px;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.enatente {
+    background-color: #eeb84ad3;
+    padding: 5px;
+    font-style: italic;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 20px;
+    color: #484747;
+    margin-bottom: 20px;
+}
+
+.encontractualisation {
+    background-color: #ee784ae4;
+    padding: 5px;
+    font-style: italic;
+    font-size: 5px;
+    font-weight: 600;
+    border-radius: 20px;
+    color: #676363;
+    margin-bottom: 20px;
+}
+
+.enetude {
+    background-color: #b6b6b6d3;
+    padding: 5px;
+    font-style: italic;
+    font-size: 5px;
+    font-weight: 600;
+    border-radius: 20px;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+
+
+
+.p-scrollpanel {
+    p {
+        padding: .5rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    &.custombar1 {
+        .p-scrollpanel-wrapper {
+            border-right: 9px solid var(--layer-1);
+        }
+
+        .p-scrollpanel-bar {
+            background-color: var(--primary-color);
+            opacity: 1;
+            transition: background-color .2s;
+
+            &:hover {
+                background-color: #007ad9;
+            }
+        }
+    }
+
+    &.custombar2 {
+        .p-scrollpanel-wrapper {
+            border-right: 9px solid var(--layer-1);
+            border-bottom: 9px solid var(--layer-1);
+        }
+
+        .p-scrollpanel-bar {
+            background-color: var(--layer-2);
+            border-radius: 0;
+            opacity: 1;
+            transition: background-color .2s;
+        }
+    }
+}
+
+.card-danger {
+    background: rgb(248, 52, 52);
+}
+
+.info {
+    background: rgba(198, 220, 246, 0.877);
+    border-left: 10px solid #06c;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.headspan {
+    color: #06c;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 5px;
+    margin-left: 5px;
+}
+
+.fieldset {
+    border: 0.2px solid #e4e4e46c;
+    border-radius: 8px;
+    padding: 5px;
+    background: #f6f6f6ed;
+}
+
+.danger {
+    background: rgba(248, 201, 201, 0.793);
+    border-left: 10px solid rgb(248, 52, 52);
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.fichierequis {
+    padding: 7px;
+    border-radius: 8px;
+}
+
+.piece {
+    color: rgb(1, 46, 91);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+
+.activiteAR {
+    color: rgb(23, 74, 125);
+    font-size: 12px;
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+}
+
+.activiteARLib {
+    text-transform: lowercase;
+}
+
+.titAction {
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.actionNonCOurs :hover {
+    cursor: pointer;
+}
+
+.titreCard {
+    font-size: 16px;
+    text-transform: uppercase;
+    color: rgb(23, 74, 125);
+    font-weight: bold;
+}
+
+.upp {
+    text-transform: uppercase;
+}
+
+
+.actionNonCOurs {
+    color: rgb(23, 74, 125);
+}
+
+.custom-scrollbar15 {
+    height: 15vw;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Rendre la barre de défilement horizontale invisible */
+    background-color: #f5f5f5;
+    position: relative;
+}
+
+.custom-scrollbar15 .scroll-content {
+    padding-right: 3px;
+}
+
+.custom-scrollbar15::-webkit-scrollbar {
+    width: 7px;
+}
+
+.custom-scrollbar15::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    opacity: 1;
+    transition: background-color .2s;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.custom-scrollbar15::-webkit-scrollbar-track {
+    background-color: rgb(187, 187, 187);
+    /* Couleur de fond de la barre de défilement verticale */
+}
+
+.custom-scrollbar15::-webkit-scrollbar-thumb:hover {
+    background-color: #007ad9;
+    /* Change background color on hover */
+}
+
+::ng-deep .p-menu {
+    width: 300px;
+    /* Set the desired width for the menu */
+}
+
+/* CSS pour définir la hauteur des lignes d'un tableau PrimeNG */
+:host ::ng-deep .p-datatable .p-datatable-tbody>tr {
+    height: 10px;
+    /* Hauteur souhaitée pour les lignes du tableau */
+}
+
+
+#menuOptionCan {
+    width: 200px;
+    /* Set the desired width for the menu */
+}
+
+/* Réduire le padding du contenu des p-tabPanel */
+.ui-tabview .ui-tabview-panel .ui-tabview-panel-content {
+    padding: 10px;
+    /* Ajustez la valeur du padding selon vos besoins */
+}
+
+.desacive {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+
+
+label {
+    color: rgb(23, 74, 125);
+    font-size: 15px;
+    font-weight: 600;
+}
