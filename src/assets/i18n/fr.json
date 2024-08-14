@@ -1,5 +1,10 @@
 {
+  "remplissage": "Rassurer-vous de bien remplir toutes les informations des champs requis (*)",
   "echeance": "Échéance",
+  "Responsablea": "Responsable(s)",
+  "Approbateur": "Approbateur(s)",
+  "Consulté": "Consulté(s)",
+  "Informé": "Informé(s)",
   "successDeleteAR": "Activité à réaliser supprimée avec succès !",
   "errorDeleteAR": "Une erreur est survenue lors de la suppréssion de l'activité",
   "deleteAR": "Êtes-vous certain de vouloir supprimer cette activité ?",

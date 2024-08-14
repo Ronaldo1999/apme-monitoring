@@ -331,48 +331,23 @@ export class ElaborationComponent implements OnInit {
     this.operationPage = false;
     this.detailActivitePage = true;
     this.getPageByAction(Action.CREATEAR);
-    if (activiteAR.typer == 1 && activiteAR.r) { this.selectedAR = JSON.parse(activiteAR.r); } else { this.selectedStrR = JSON.parse(activiteAR.r); }
-    if (activiteAR.typea == 1 && activiteAR.a) { this.selectedAA = JSON.parse(activiteAR.a); } else { this.selectedStrA = JSON.parse(activiteAR.a); }
-    if (activiteAR.typec == 1 && activiteAR.c) { this.selectedAC = JSON.parse(activiteAR.c); } else { this.selectedStrC = JSON.parse(activiteAR.c); }
-    if (activiteAR.typei == 1 && activiteAR.i) { this.selectedAI = JSON.parse(activiteAR.i); } else { this.selectedStrI = JSON.parse(activiteAR.i); }
+    this.selectedStrR = this.getSelectedElementsFrom('r', this.selectedStrR);
+    this.selectedStrA = this.getSelectedElementsFrom('a', this.selectedStrA);
+    this.selectedStrC = this.getSelectedElementsFrom('c', this.selectedStrC);
+    this.selectedStrI = this.getSelectedElementsFrom('i', this.selectedStrI);
+    this.selectedAR = this.getSelectedElementsFrom('r', this.selectedAR);
+    this.selectedAA = this.getSelectedElementsFrom('a', this.selectedAA);
+    this.selectedAC = this.getSelectedElementsFrom('c', this.selectedAC);
+    this.selectedAI = this.getSelectedElementsFrom('i', this.selectedAI);
+    /* 
+        if (activiteAR.typer == 1 && activiteAR.r) { this.selectedAR = JSON.parse(activiteAR.r); } else { this.selectedStrR = JSON.parse(activiteAR.r); }
+        if (activiteAR.typea == 1 && activiteAR.a) { this.selectedAA = JSON.parse(activiteAR.a); } else { this.selectedStrA = JSON.parse(activiteAR.a); }
+        if (activiteAR.typec == 1 && activiteAR.c) { this.selectedAC = JSON.parse(activiteAR.c); } else { this.selectedStrC = JSON.parse(activiteAR.c); }
+        if (activiteAR.typei == 1 && activiteAR.i) { this.selectedAI = JSON.parse(activiteAR.i); } else { this.selectedStrI = JSON.parse(activiteAR.i); } */
 
   }
 
-/*   getResponsable() {
-    let groupedValues = ""; // Initialiser la chaîne pour les valeurs regroupées
 
-    if (activiteAR.typer == 1 && activiteAR.r) {
-      this.selectedAR = JSON.parse(activiteAR.r);
-      groupedValues += `R= ${this.selectedAR.}/${this.selectedAR.structure}; `;
-    } else {
-      this.selectedStrR = JSON.parse(activiteAR.r);
-    }
-
-    if (activiteAR.typea == 1 && activiteAR.a) {
-      this.selectedAA = JSON.parse(activiteAR.a);
-      groupedValues += `A= ${this.selectedAA.agent}/${this.selectedAA.structure}; `;
-    } else {
-      this.selectedStrA = JSON.parse(activiteAR.a);
-    }
-
-    if (activiteAR.typec == 1 && activiteAR.c) {
-      this.selectedAC = JSON.parse(activiteAR.c);
-      groupedValues += `C= ${this.selectedAC.agent}/${this.selectedAC.structure}; `;
-    } else {
-      this.selectedStrC = JSON.parse(activiteAR.c);
-    }
-
-    if (activiteAR.typei == 1 && activiteAR.i) {
-      this.selectedAI = JSON.parse(activiteAR.i);
-      groupedValues += `I= ${this.selectedAI.agent}/${this.selectedAI.structure}; `;
-    } else {
-      this.selectedStrI = JSON.parse(activiteAR.i);
-    }
-
-    // Afficher ou utiliser la chaîne regroupée
-    console.log(groupedValues.trim()); // Utilisez trim() pour enlever l'espace final
-
-  } */
   getOP(operation: MoOperation, action: string) {
     this.operation = { ...operation };
     this.acte = 3;
@@ -872,10 +847,6 @@ export class ElaborationComponent implements OnInit {
       let ps = new PlanStructure()
       ps.moPlanStructureID = `MOPST${new Date().toISOString().replace(/[-:]/g, '').replace('T', '').replace(/\..*$/, '')}.${Math.floor(Math.random() * 1000)}.${Math.floor(Math.random() * 1000)}`;
       ps.structureID = ele;
-      ps.moPlanTravailID = this.pa.moPlanTravailID;
-      ps.organisationID = this.organisation.organisationID;
-      ps.millesime = this.exercice.millesime;
-      ps.user_update = this.ts.getUser().username;
       this.pa.planstructures.push(Object.assign({}, ps));
     }
     this.pa.organisationID = this.organisation.organisationID;
@@ -896,8 +867,29 @@ export class ElaborationComponent implements OnInit {
     })
   }
 
-
   getPF(pfID: string) { let pf: MoPointFocale = new MoPointFocale(); for (const ele of this.pfs) { if (ele.moPointFocaleID == pfID) { pf = ele; } } return pf; }
+
+  getResponsable(a: ActiviteARealiser) {
+    return a.r + ';' + a.a + ';' + a.c + '; ' + a.i;
+  }
+
+  updateActiviteAR(property: 'r' | 'a' | 'c' | 'i', selectedArray: string[]) {
+    this.activiteAR[property] = property.toLocaleUpperCase() + '=' + selectedArray.join(',');
+  }
+  getSelectedElementsFrom2(property: 'r' | 'a' | 'c' | 'i', selectedArray: string[]) {
+    selectedArray = this.activiteAR[property].split(',') || [];
+    return selectedArray;
+  }
+  getSelectedElementsFrom(property: 'r' | 'a' | 'c' | 'i', selectedArray: string[]) {
+    const value = this.activiteAR[property];
+    if (value) {
+      const parts = value.split('=');
+      if (parts.length > 1) {
+        selectedArray = parts[1].split(',').map(item => item.trim()); // Sépare les éléments et enlève les espaces
+      }
+    }
+    return selectedArray;
+  }
 
 
   saveActivite() {
@@ -908,10 +900,8 @@ export class ElaborationComponent implements OnInit {
     this.activiteAR.millesime = this.exercice.millesime;
     this.activiteAR.user_update = this.ts.getUser().username;
     this.activiteAR.ip_update = this.ip;
-    if (this.activiteAR.typer == 1) { this.activiteAR.r = JSON.stringify(this.selectedAR); } else { this.activiteAR.r = JSON.stringify(this.selectedStrR); }
-    if (this.activiteAR.typea == 1) { this.activiteAR.a = JSON.stringify(this.selectedAA); } else { this.activiteAR.a = JSON.stringify(this.selectedStrA); }
-    if (this.activiteAR.typec == 1) { this.activiteAR.c = JSON.stringify(this.selectedAC); } else { this.activiteAR.c = JSON.stringify(this.selectedStrC); }
-    if (this.activiteAR.typei == 1) { this.activiteAR.i = JSON.stringify(this.selectedAI); } else { this.activiteAR.i = JSON.stringify(this.selectedStrI); }
+    console.log(this.selectedAR);
+    console.log(this.selectedStrR);
     this.displaySpinner = true;
     console.log(this.activiteAR);
     this.api.saveActivite(this.activiteAR).subscribe(data => {
@@ -1034,10 +1024,10 @@ export class ElaborationComponent implements OnInit {
 
     doc.setFontSize(12);
     doc.setFont('Helvetica', 'bold');
-    doc.text(leftTextPlan, pageWidth / 2, 37, { align: 'center' });
+    doc.text(leftTextPlan, (pageWidth / 2) - 40, 37, { align: 'center' });
     doc.setFontSize(11);
     doc.setFont('Helvetica', 'normal');
-    doc.text(txtPlan, pageWidth / 2, 42, { align: 'center' });
+    doc.text(txtPlan, (pageWidth / 2) - 40, 42, { align: 'center' });
     doc.setFontSize(9);
     doc.setTextColor(128, 128, 128);
     doc.text("Budget : " + txtExercice, 15, 43);
@@ -1136,7 +1126,7 @@ export class ElaborationComponent implements OnInit {
             libelleFr: child.data.libelleFr ? child.data.libelleFr : '',
             objectif: child.data.objectif ? child.data.objectif : '',
             indicateur: child.data.indicateur ? child.data.indicateur : '',
-            responsables: child.data.responsables ? child.data.responsables : '',
+            responsables: this.getResponsable(child.data) ? this.getResponsable(child.data) : '',
             statut: child.data.statut ? child.data.statut : '',
             montant: child.data.montant ? NumberFormatter.formatWithThousandSeparator(child.data.montant) : 0
           });
@@ -1147,17 +1137,16 @@ export class ElaborationComponent implements OnInit {
       const totalWidth = doc.internal.pageSize.getWidth();
       let pageCount = 0;
       autoTable(doc, {
-        head: [['CODE', 'DÉSIGNATION', 'OBJECTIFS', 'INDICATEURS', 'RESPONSABLES', 'STATUTS', 'COÛTS']],
+        head: [['DÉSIGNATION', 'OBJECTIFS', 'INDICATEURS', 'RESPONSABLES', 'STATUTS', 'COÛTS']],
         body: data.map(item => {
           if ([4].includes(item.niveauActiviteID)) {
-            return [{ content: item.code + " - " + item.libelleFr, colSpan: 6, styles: { fillColor: '#d8d8d8', fontStyle: 'bold' } },
-            { content: item.montant, styles: { valign: 'middle', halign: 'right', fillColor: '#d8d8d8', fontStyle: 'bold' } },];
+            return [{ content: item.code + " - " + item.libelleFr, colSpan: 5, styles: { fillColor: '#d8d8d8', fontStyle: 'bold' } },
+            { content: item.montant, styles: { valign: 'middle', halign: 'right', fillColor: '#d8d8d8', fontStyle: 'bold', borderLeft: 'none' } },];
           }
           return [
-            { content: item.code, styles: { valign: 'middle', halign: 'left', fontStyle: 'bold', textColor: '#007ad9' } },
-            item.libelleFr,
-            item.objectif,
-            item.indicateur,
+            { content: item.libelleFr, styles: { valign: 'middle', fontStyle: 'normal', halign: 'left', fontSize: 7 } },
+            { content: item.objectif, styles: { valign: 'middle', halign: 'left', fontSize: 6.3 } },
+            { content: item.indicateur, styles: { valign: 'middle', halign: 'left', fontSize: 6.3 } },
             { content: item.responsables, styles: { valign: 'middle', halign: 'left', fontSize: 6 } },
             { content: 'Non valide', styles: { valign: 'middle', halign: 'center', fontSize: 6, fontStyle: 'bolditalic' } },
             { content: item.montant, styles: { valign: 'middle', halign: 'right', fillColor: '#d8d8d8', fontStyle: 'bold' } },
@@ -1165,15 +1154,14 @@ export class ElaborationComponent implements OnInit {
         }),
         startY: 53,
         theme: 'grid',
-        headStyles: { fillColor: [23, 74, 125], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7, valign: 'middle', },
+        headStyles: { fillColor: [23, 74, 125], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.2, valign: 'middle', },
         columnStyles: {
-          0: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'bold', cellWidth: (totalWidth * 0.05) },
-          1: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'bold', cellWidth: (totalWidth * 0.25) },
-          2: { valign: 'middle', halign: 'left', fontSize: 8, fontStyle: 'normal', cellWidth: (totalWidth * 0.25) },
+          0: { valign: 'middle', halign: 'left', fontSize: 9, },
+          1: { valign: 'middle', halign: 'left', fontSize: 8, fontStyle: 'normal', cellWidth: (totalWidth * 0.25) },
+          2: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
           3: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
           4: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
-          5: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
-          6: { valign: 'middle', halign: 'right', fontSize: 7.1, fontStyle: 'bold', cellWidth: (totalWidth * 0.08) },
+          5: { valign: 'middle', halign: 'right', fontSize: 7.1, fontStyle: 'bold', cellWidth: (totalWidth * 0.08) },
         },
         didDrawPage: (data) => {
           pageCount++;
@@ -1193,7 +1181,6 @@ export class ElaborationComponent implements OnInit {
     this.pdfData = this.sanitizer.bypassSecurityTrustResourceUrl(pdfData);
     this.printDialog = true;
   }
-
 
   async printFiche(mode: PrintMode): Promise<void> {
     this.mode = mode;
@@ -1222,10 +1209,6 @@ export class ElaborationComponent implements OnInit {
     const textWidth2 = doc.getStringUnitWidth(rightText2) * 10 / doc.internal.scaleFactor;
     const textWidth3 = doc.getStringUnitWidth(rightText3) * 10 / doc.internal.scaleFactor;
 
-    const textWidth = doc.getStringUnitWidth(leftTextPlan) * 14 / doc.internal.scaleFactor;
-    const startX = (pageWidth - textWidth) / 2;
-    const endX = startX + textWidth;
-
     doc.addImage('assets/apme.png', 'PNG', imgX, 10, imgWidth, imgHeight);
     doc.setFontSize(10);
     doc.text(rightText1, rightX - textWidth1, 20);
@@ -1245,37 +1228,79 @@ export class ElaborationComponent implements OnInit {
     doc.setFontSize(9);
     doc.setTextColor(128, 128, 128);
     doc.text(this.translate.instant('budget') + txtExercice, 15, 43);
+    doc.text(this.translate.instant('debut') + dateDebut, pageWidth / 2, 43);
     doc.text(this.translate.instant('pft') + txtPf, 15, 48);
+    doc.text(this.translate.instant('fin') + dateFin, pageWidth / 2, 48);
     doc.text(this.translate.instant('pat') + txtPlan, 15, 53);
-    doc.text(this.translate.instant('debut') + dateDebut, 15, 58);
-    doc.text(this.translate.instant('fin') + dateFin, 15, 63);
-    doc.text(this.translate.instant('da') + libelleFrAR, 15, 68);
-    doc.text(this.translate.instant('modeContractualisation') + ' : ' + modeA, 15, 73);
+    doc.text(this.translate.instant('modeContractualisation') + ' : ' + modeA, pageWidth / 2, 53);
+    doc.text(this.translate.instant('da') + libelleFrAR, 15, 58);
     doc.setFontSize(11);
     doc.setTextColor(0, 0, 0);
     doc.setFont('Helvetica', 'bold');
-    let currentY = 83;
+    const totalWidth = doc.internal.pageSize.getWidth();
+    let currentY = 70;
+
+    const operationData = this.operations.map((item, index) => { return [index + 1, item.libelleFr, item.montant ? NumberFormatter.formatWithThousandSeparator(item.montant) : 0]; });
+    const objectifData = this.operations.map((item, index) => { return [index + 1, item.libelleFr, item.montant ? NumberFormatter.formatWithThousandSeparator(item.montant) : 0]; });
+    const raciData = this.operations.map((item, index) => { return [index + 1, item.libelleFr, item.montant ? NumberFormatter.formatWithThousandSeparator(item.montant) : 0]; });
+
+    const lineHeight = 10; // Hauteur d'une ligne (en unités de votre choix)
+
+    const numberOfRowsOp = operationData.length; // Nombre de lignes de données
+    const numberOfRowsOb = objectifData.length; // Nombre de lignes de données
+    const numberOfRowsRaci = raciData.length; // Nombre de lignes de données
+
+    const totalHeightOp = lineHeight + (lineHeight * numberOfRowsOp); // Hauteur totale
+    const totalHeightOb = lineHeight + (lineHeight * numberOfRowsOb); // Hauteur totale
+    const totalHeightRaci = lineHeight + (lineHeight * numberOfRowsRaci); // Hauteur totale
+
+    // Ajouter du texte après le tableau 1
+    /* const startY = doc.autoTable.finalY + 10; // Définir la nouvelle position Y
+    doc.text("Texte après le premier tableau", 10, startY); */
+
+
     doc.text(this.translate.instant('operationsAR'), 15, currentY);
     doc.line(15, currentY + 1, 15 + doc.getTextWidth(this.translate.instant('operationsAR')), currentY + 1);
-    autoTable(doc, { startY: currentY + 5, head: [['N°', 'Désignation', 'Coût']], body: [[1, 'Article A', 100], [2, 'Article B', 200],], });
+    autoTable(doc, {
+      startY: currentY + 3, head: [['N°', 'Désignation', 'Coût']], body: operationData, theme: 'grid',
+      headStyles: { fillColor: [23, 74, 125], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9, valign: 'middle', },
+      columnStyles: {
+        0: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'bold', cellWidth: (totalWidth * 0.05) },
+        1: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
+        2: { valign: 'middle', halign: 'right', fontSize: 8.1, fontStyle: 'bold', cellWidth: (totalWidth * 0.10) },
+      },
+    });
+    currentY += totalHeightOp + 10;
 
-    currentY += 10;
     doc.text(this.translate.instant('objectifs'), 15, currentY);
     doc.line(15, currentY + 1, 15 + doc.getTextWidth(this.translate.instant('objectifs')), currentY + 1);
+    autoTable(doc, {
+      startY: currentY + 3, head: [['N°', 'Code', 'Désignation']], body: operationData, theme: 'grid',
+      headStyles: { fillColor: [23, 74, 125], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9, valign: 'middle', },
+      columnStyles: {
+        0: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'bold', cellWidth: (totalWidth * 0.03) },
+        1: { valign: 'middle', halign: 'right', fontSize: 9, fontStyle: 'bold', cellWidth: (totalWidth * 0.10) },
+        2: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
+      },
+    });
+    currentY += totalHeightOb + 10;
 
-    autoTable(doc, { startY: currentY + 5, head: [['N°', 'Code', 'Désignation', 'Taux .R.']], body: [[1, 'C01', 'Objectif A', '10%'], [2, 'C02', 'Objectif B', '20%'],], });
-    currentY += 10;
     doc.text(this.translate.instant('racis'), 15, currentY);
     doc.line(15, currentY + 1, 15 + doc.getTextWidth(this.translate.instant('racis')), currentY + 1);
-
-    autoTable(doc, { startY: currentY + 5, head: [['N°', 'Role', 'Intitulé']], body: [[1, 'R001', 'Rôle A'], [2, 'R002', 'Rôle B'],], });
+    autoTable(doc, {
+      startY: currentY + 3, head: [['N°', 'Role', 'Intitulé']], body: operationData, theme: 'grid',
+      headStyles: { fillColor: [23, 74, 125], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9, valign: 'middle', },
+      columnStyles: {
+        0: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'bold', cellWidth: (totalWidth * 0.03) },
+        1: { valign: 'middle', halign: 'right', fontSize: 9, fontStyle: 'bold', cellWidth: (totalWidth * 0.20) },
+        2: { valign: 'middle', halign: 'left', fontSize: 9, fontStyle: 'normal' },
+      },
+    });
+    console.log(doc.autoTable.toString());
 
     const pageSize = doc.internal.pageSize;
     const pageHeight = pageSize.height;
-
-    const totalWidth = doc.internal.pageSize.getWidth();
     let pageCount = 0;
-
     const totalPages = doc.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) { doc.setPage(i); doc.text(`Page ${i} / ${totalPages}`, pageWidth - 30, pageHeight - 10); }
 
@@ -1283,6 +1308,7 @@ export class ElaborationComponent implements OnInit {
     this.pdfData = this.sanitizer.bypassSecurityTrustResourceUrl(pdfData);
     this.printDialog = true;
   }
+
   async printMemoire(mode: PrintMode): Promise<void> {
     this.mode = mode;
     const doc = new jsPDF();
@@ -1306,7 +1332,6 @@ export class ElaborationComponent implements OnInit {
     const textWidth1 = doc.getStringUnitWidth(rightText1) * 10 / doc.internal.scaleFactor;
     const textWidth2 = doc.getStringUnitWidth(rightText2) * 10 / doc.internal.scaleFactor;
     const textWidth3 = doc.getStringUnitWidth(rightText3) * 10 / doc.internal.scaleFactor;
-    const textWidth = doc.getStringUnitWidth(leftTextPlan) * 14 / doc.internal.scaleFactor;
 
     doc.addImage('assets/apme.png', 'PNG', imgX, 10, imgWidth, imgHeight);
     doc.setFontSize(10);
@@ -1328,8 +1353,8 @@ export class ElaborationComponent implements OnInit {
     doc.setTextColor(128, 128, 128);
     doc.text(this.translate.instant('budget') + txtExercice, 15, 43);
     doc.text(this.translate.instant('pft') + txtPf, 15, 48);
-    doc.text(this.translate.instant('pat') + txtPlan, pageWidth / 2, 43);
-    doc.text(this.translate.instant('da') + libelleFrAR, pageWidth / 2, 48);
+    doc.text(this.translate.instant('pat') + txtPlan, (pageWidth / 2) - doc.getStringUnitWidth(txtPlan), 43);
+    doc.text(this.translate.instant('da') + libelleFrAR, (pageWidth / 2) - doc.getStringUnitWidth(txtPlan), 48);
 
     const data = this.depenses.map((exam, index) => {
       return [index + 1, this.getUOeuvre(exam.moUniteOeuvreID).designation, this.getUOeuvre(exam.moUniteOeuvreID).conditionnement, this.getUOeuvre(exam.moUniteOeuvreID).prixunitaire, exam.quantite, exam.montant ? NumberFormatter.formatWithThousandSeparator(exam.montant) : 0];
@@ -1402,77 +1427,18 @@ export class ElaborationComponent implements OnInit {
     return allChildren;
   }
 
-  /*  async getAllChildrenAR(activite: any) {
-     let allChildren: any[] = [];
-     const activitiesAR = await this.getARList(activite);
-     allChildren = allChildren.concat(activitiesAR);
-     return allChildren;
-   } */
-  /*  async listActiviteTache() {
-    let allData: any[] = [];
-    let activities = [];
-    const taches = await this.api.listActiviteTache(this.organisation.organisationID, this.exercice.millesime, this.pa.moPlanTravailID).toPromise();
-    console.log(taches);
-    for await (const item of taches) {
-      let op: TreeNode = { key: '', data: null, type: '', parent: undefined };
-      op.key = item.activiteID;
-      op.data = item;
-      op.parent = item.activiteParentID;
-      op.type = 'activite';
-      activities.push(op);
-    }
-    allData = allData.concat(activities);
-    for (const activite of activities) {
-      const childrenWithAR = await this.getAllChildrenAR(activite.data);
-      console.log(activite);
-      allData = allData.concat(childrenWithAR);
-    }
-    return allData;
-  } */
-  /* async listActiviteTache() {
-    let allData: any[] = [];
-    const activitiesMap: { [key: string]: TreeNode } = {};
-    const taches = await this.api.listActiviteTache(this.organisation.organisationID, this.exercice.millesime, this.pa.moPlanTravailID).toPromise();
-    console.log(taches);
-    for (const item of taches) {
-      let op: TreeNode = { key: item.activiteID, data: item, type: 'activite', parent: item.activiteParentID };
-      activitiesMap[item.activiteID] = op;
-    }
-    for (const item of taches) {
-      const activite = activitiesMap[item.activiteID];
-      allData.push(activite);
-    }
-    for (const activite of Object.values(activitiesMap)) {
-      const childrenWithAR = await this.getAllChildrenAR(activite.data);
-      activite.children = activite.children || [];
-      activite.children.push(...childrenWithAR);
-    }
-
-    return allData;
-  }
-
-  async getAllChildrenAR(activite: any) {
-    let allChildren: any[] = [];
-    const activitiesAR = await this.getARList(activite);
-    allChildren = allChildren.concat(activitiesAR);
-    return allChildren;
-  } */
-
   async listActiviteTache() {
     let allData: any[] = [];
     const activitiesMap: { [key: string]: TreeNode } = {};
     const taches = await this.api.listActiviteTache(this.organisation.organisationID, this.exercice.millesime, this.pa.moPlanTravailID).toPromise();
     console.log(taches);
-
     for (const item of taches) {
       let op: TreeNode = { key: item.activiteID, data: item, type: 'activite', children: [] };
       activitiesMap[item.activiteID] = op;
       allData.push(op);
-
       const childrenWithAR = await this.getAllChildrenAR(item);
       op.children = childrenWithAR;
     }
-
     return allData;
   }
 
@@ -1485,16 +1451,8 @@ export class ElaborationComponent implements OnInit {
 
 
 
-  generateObjectiveCode(): string {
-    this.currentIndex = this.objectifs.length + 1;
-    const paddedIndex = String(this.currentIndex).padStart(6, '0');
-    const code = `OB${paddedIndex}`; this.currentIndex++; return code;
-  }
-  generateIndCode(codeOb: string): string {
-    this.currentIndexInd = this.indicateurs.length + 1;
-    const paddedIndex = String(this.currentIndexInd).padStart(4, '0');
-    const code = codeOb.slice(-2) + `I${paddedIndex}`; this.currentIndexInd++; return code;
-  }
+  generateObjectiveCode(): string { this.currentIndex = this.objectifs.length + 1; const paddedIndex = String(this.currentIndex).padStart(6, '0'); const code = `OB${paddedIndex}`; this.currentIndex++; return code; }
+  generateIndCode(codeOb: string): string { this.currentIndexInd = this.indicateurs.length + 1; const paddedIndex = String(this.currentIndexInd).padStart(4, '0'); const code = codeOb.slice(-2) + `I${paddedIndex}`; this.currentIndexInd++; return code; }
 
 
   async getActivitiesFromAllLevel() {
